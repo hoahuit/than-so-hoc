@@ -17,7 +17,7 @@ export const MarqueeBanner: React.FC = () => {
       <div className="flex w-max animate-marquee space-x-8 whitespace-nowrap text-xs sm:text-sm font-semibold tracking-wider">
         {[...marqueeItems, ...marqueeItems, ...marqueeItems].map((item, idx) => (
           <div key={idx} className="flex items-center gap-2.5">
-            <span className="rounded bg-crimson-500/12 px-1.5 py-0.5 font-jp text-xs sm:text-sm font-bold text-crimson-600">
+            <span className="rounded bg-crimson-500/15 px-1.5 py-0.5 font-jp text-xs sm:text-sm font-bold text-crimson-600">
               {item.kanji}
             </span>
             <span className="text-ink/85">{item.text}</span>

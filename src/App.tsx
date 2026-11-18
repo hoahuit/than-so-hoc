@@ -5,6 +5,7 @@ import { Header } from './components/Header';
 import { MarqueeBanner } from './components/MarqueeBanner';
 import { PlansCarousel } from './components/PlansCarousel';
 import { OmikujiBoxInteractive } from './components/OmikujiBoxInteractive';
+import { OmikujiShakeModal } from './components/OmikujiShakeModal';
 import { TarotOmikujiDeck } from './components/TarotOmikujiDeck';
 import { FortuneCardDisplay } from './components/FortuneCardDisplay';
 import { DailyFortune } from './components/DailyFortune';
@@ -20,8 +21,8 @@ export function App() {
   const [selectedPlan, setSelectedPlan] = useState<PlanType>('love');
   const [currentFortune, setCurrentFortune] = useState<OmikujiFortune>(OMIKUJI_DATABASE[0]);
   const [flipVersion, setFlipVersion] = useState<number>(0);
-  const [drawTrigger, setDrawTrigger] = useState<number>(0);
 
+  const [isShakeModalOpen, setIsShakeModalOpen] = useState<boolean>(false);
   const [isNumerologyOpen, setIsNumerologyOpen] = useState<boolean>(false);
   const [isSavedOpen, setIsSavedOpen] = useState<boolean>(false);
   const [activeMobileTab, setActiveMobileTab] = useState<'home' | 'plans' | 'numerology' | 'saved'>('home');
@@ -58,14 +59,16 @@ export function App() {
     }
   };
 
-  const handleTriggerDrawAndScroll = useCallback(() => {
-    scrollToElement('omikuji-box-section');
-    setTimeout(() => {
-      setDrawTrigger((prev) => prev + 1);
-    }, 350);
+  const handleOpenShakeModal = useCallback(() => {
+    setIsShakeModalOpen(true);
   }, []);
 
-  const handleFortuneDrawn = useCallback((fortune: OmikujiFortune) => {
+  const handleFortuneDrawnFromModal = useCallback((fortune: OmikujiFortune) => {
+    setCurrentFortune(fortune);
+    setFlipVersion((prev) => prev + 1);
+  }, []);
+
+  const handleFortunePickedFromTarot = useCallback((fortune: OmikujiFortune) => {
     setCurrentFortune(fortune);
     setFlipVersion((prev) => prev + 1);
     setTimeout(() => {
@@ -74,10 +77,15 @@ export function App() {
     }, 280);
   }, []);
 
-  const isCurrentSaved = savedFortunes.some((entry) => entry.fortune.id === currentFortune.id);
+  const isFortuneSaved = useCallback(
+    (fortune: OmikujiFortune) => savedFortunes.some((entry) => entry.fortune.id === fortune.id),
+    [savedFortunes]
+  );
+
+  const isCurrentSaved = isFortuneSaved(currentFortune);
 
   const handleSaveFortune = (fortune: OmikujiFortune) => {
-    if (savedFortunes.some((entry) => entry.fortune.id === fortune.id)) {
+    if (isFortuneSaved(fortune)) {
       showToast('Lá quẻ này đã có trong bộ sưu tập của bạn!');
       return;
     }
@@ -136,7 +144,7 @@ export function App() {
       <Header
         onOpenNumerology={() => setIsNumerologyOpen(true)}
         onOpenSaved={() => setIsSavedOpen(true)}
-        onScrollToOmikuji={() => scrollToElement('omikuji-box-section')}
+        onScrollToOmikuji={handleOpenShakeModal}
         onOpenTarotDraw={() => scrollToElement('tarot-omikuji-section')}
         savedCount={savedFortunes.length}
       />
@@ -150,12 +158,13 @@ export function App() {
           className="absolute inset-0 h-full w-full object-cover object-right md:object-[center_20%]"
         />
 
-        {/* Soft Rose-Burgundy Scrim on Left for Effortless Readability */}
+        {/* Soft Rose-Burgundy Scrim on Left & Subtle Top Vignette for Floating Transparent Header */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#38131d]/95 via-[#491926]/70 to-transparent md:via-[#491926]/55" />
+        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#2b0d16]/75 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#38131d]/50 to-transparent" />
 
         {/* Hero Foreground Content */}
-        <div className="relative z-20 w-full px-5 py-14 sm:px-8 md:py-20 lg:px-12 lg:py-24 xl:px-16">
+        <div className="relative z-20 w-full px-5 pt-28 pb-14 sm:px-8 sm:pt-32 md:pt-36 md:pb-20 lg:px-12 lg:pt-40 lg:pb-24 xl:px-16">
           <div className="max-w-2xl">
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-rose-200/35 bg-white/10 px-3.5 py-1 backdrop-blur-sm">
               <span className="font-jp text-xs font-semibold tracking-[0.28em] text-amber-100">
@@ -173,13 +182,13 @@ export function App() {
             </p>
 
             <p className="mt-2 max-w-md text-xs sm:text-sm leading-relaxed text-rose-100/85">
-              Khám phá con số định mệnh, chọn lá bài Tarot – Omikuji thu hút bạn nhất và nhận thông điệp tươi sáng từ vũ trụ cho ngày hôm nay.
+              Khám phá con số định mệnh, lắc hũ thẻ tre Omikuji tràn viền hoặc chọn lá bài Tarot thu hút bạn nhất để nhận thông điệp tươi sáng từ vũ trụ.
             </p>
 
-            {/* Youthful Glowing Pill CTAs matching mockup */}
+            {/* Youthful Glowing Pill CTAs */}
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <button
-                onClick={handleTriggerDrawAndScroll}
+                onClick={handleOpenShakeModal}
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#f26979] via-[#e64b5e] to-[#d93d50] px-7 py-3 text-sm font-bold text-white shadow-[0_8px_24px_rgba(232,83,102,0.5)] transition-all hover:-translate-y-0.5 hover:brightness-105 active:scale-95"
               >
                 <span>Rút quẻ ngay</span>
@@ -188,7 +197,7 @@ export function App() {
 
               <button
                 onClick={() => setIsNumerologyOpen(true)}
-                className="inline-flex items-center justify-center gap-1 rounded-full border border-amber-200/65 bg-white/12 px-6 py-3 text-sm font-semibold text-amber-50 backdrop-blur-sm transition-all hover:bg-white/20 hover:border-amber-200"
+                className="inline-flex items-center justify-center gap-1 rounded-full border border-amber-200/75 bg-white/15 px-6 py-3 text-sm font-semibold text-amber-50 backdrop-blur-sm transition-all hover:bg-white/25 hover:border-amber-200"
               >
                 <span>Khám phá thần số học</span>
                 <ChevronRight className="h-4 w-4" />
@@ -209,7 +218,7 @@ export function App() {
             <PlansCarousel
               selectedPlan={selectedPlan}
               onSelectPlan={setSelectedPlan}
-              onScrollToDraw={() => scrollToElement('omikuji-box-section')}
+              onScrollToDraw={handleOpenShakeModal}
             />
           </div>
 
@@ -217,8 +226,7 @@ export function App() {
             <div className="w-full flex">
               <OmikujiBoxInteractive
                 selectedPlan={selectedPlan}
-                drawTrigger={drawTrigger}
-                onFortuneDrawn={handleFortuneDrawn}
+                onOpenShakeModal={handleOpenShakeModal}
                 onScrollToTarot={() => scrollToElement('tarot-omikuji-section')}
               />
             </div>
@@ -228,7 +236,7 @@ export function App() {
         {/* MIDDLE ROW: Interactive Lively Tarot-Omikuji Card Fan */}
         <TarotOmikujiDeck
           selectedPlan={selectedPlan}
-          onCardPicked={handleFortuneDrawn}
+          onCardPicked={handleFortunePickedFromTarot}
         />
 
         {/* BOTTOM ROW: Daily Lucky Number (Left) + Fortune Result Card (Right) */}
@@ -247,7 +255,7 @@ export function App() {
                 isSaved={isCurrentSaved}
                 onSave={handleSaveFortune}
                 onShare={handleShareFortune}
-                onRedraw={handleTriggerDrawAndScroll}
+                onRedraw={handleOpenShakeModal}
                 flipVersion={flipVersion}
               />
             </div>
@@ -279,7 +287,7 @@ export function App() {
         }}
         onQuickDraw={() => {
           setActiveMobileTab('home');
-          handleTriggerDrawAndScroll();
+          handleOpenShakeModal();
         }}
         onNumerology={() => {
           setActiveMobileTab('numerology');
@@ -290,6 +298,17 @@ export function App() {
           setIsSavedOpen(true);
         }}
         savedCount={savedFortunes.length}
+      />
+
+      {/* ================= FULL-SCREEN OMIKUJI SHAKE RITUAL MODAL ================= */}
+      <OmikujiShakeModal
+        isOpen={isShakeModalOpen}
+        selectedPlan={selectedPlan}
+        isFortuneSaved={isFortuneSaved}
+        onClose={() => setIsShakeModalOpen(false)}
+        onFortuneRevealed={handleFortuneDrawnFromModal}
+        onSaveFortune={handleSaveFortune}
+        onShareFortune={handleShareFortune}
       />
 
       {/* ================= MODALS & DRAWERS ================= */}
@@ -312,7 +331,7 @@ export function App() {
 
       {/* ================= TOAST NOTIFICATION ================= */}
       {toastMessage && (
-        <div className="fixed left-1/2 top-20 z-50 -translate-x-1/2 w-[90%] max-w-md">
+        <div className="fixed left-1/2 top-20 z-[60] -translate-x-1/2 w-[90%] max-w-md">
           <div className="flex items-center gap-2.5 rounded-full border border-rose-300 bg-white/95 px-4 py-2.5 text-xs sm:text-sm font-semibold text-crimson-700 shadow-washi-hover backdrop-blur-md">
             <CheckCircle2 className="h-4 w-4 shrink-0 text-crimson-500" />
             <span>{toastMessage}</span>

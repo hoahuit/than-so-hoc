@@ -107,7 +107,7 @@ export const FortuneCardDisplay: React.FC<FortuneCardDisplayProps> = ({
 
               {/* Left Column: Vertical Japanese Omikuji Scroll Ribbon (matching mockup) */}
               <div className="relative z-10 flex flex-row items-center justify-between gap-3 rounded-xl border border-rose-300/80 bg-gradient-to-b from-[#fff1f2] via-[#ffe6e9] to-[#ffd9df] px-4 py-3 text-crimson-700 shadow-sm md:flex-col md:justify-center md:py-5">
-                <span className="rounded-full bg-crimson-500/12 border border-crimson-400/40 px-2 py-0.5 font-jp text-[10px] font-bold text-crimson-700">
+                <span className="rounded-full bg-crimson-500/15 border border-crimson-400/40 px-2 py-0.5 font-jp text-[10px] font-bold text-crimson-700">
                   第{String(fortune.stickNumber).padStart(2, '0')}番
                 </span>
 

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Volume2, VolumeX, Bell, Bookmark } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Volume2, VolumeX, Bookmark } from 'lucide-react';
 import { shrineAudio } from '../utils/sound';
 
 interface HeaderProps {
@@ -10,6 +10,8 @@ interface HeaderProps {
   savedCount: number;
 }
 
+type NavKey = 'home' | 'omikuji' | 'tarot' | 'numerology' | 'saved';
+
 export const Header: React.FC<HeaderProps> = ({
   onOpenNumerology,
   onOpenSaved,
@@ -18,6 +20,17 @@ export const Header: React.FC<HeaderProps> = ({
   savedCount,
 }) => {
   const [soundOn, setSoundOn] = useState<boolean>(true);
+  const [activeNav, setActiveNav] = useState<NavKey>('home');
+  const [isScrolled, setIsScrolled] = useState<boolean>(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setIsScrolled(window.scrollY > 36);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const toggleSound = () => {
     const nextState = !soundOn;
@@ -28,112 +41,150 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
+  const navItems: { key: NavKey; label: string; action: () => void }[] = [
+    {
+      key: 'home',
+      label: 'Trang chủ',
+      action: () => {
+        setActiveNav('home');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
+    },
+    {
+      key: 'omikuji',
+      label: 'Rút quẻ',
+      action: () => {
+        setActiveNav('omikuji');
+        onScrollToOmikuji();
+      },
+    },
+    {
+      key: 'tarot',
+      label: 'Tarot Omikuji',
+      action: () => {
+        setActiveNav('tarot');
+        onOpenTarotDraw();
+      },
+    },
+    {
+      key: 'numerology',
+      label: 'Thần số học',
+      action: () => {
+        setActiveNav('numerology');
+        onOpenNumerology();
+      },
+    },
+    {
+      key: 'saved',
+      label: 'Bộ sưu tập',
+      action: () => {
+        setActiveNav('saved');
+        onOpenSaved();
+      },
+    },
+  ];
+
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-rose-300/20 bg-[#3a151e]/92 px-4 sm:px-6 lg:px-10 xl:px-14 py-3 text-rose-50 backdrop-blur-md shadow-sm">
-      <div className="flex w-full items-center justify-between gap-4">
-        {/* Brand Logo with Torii Gate Emblem */}
-        <div
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="flex cursor-pointer items-center gap-2.5 group"
+    <header
+      className={`fixed inset-x-0 top-0 z-40 w-full transition-all duration-300 ${
+        isScrolled
+          ? 'bg-[#3d131e]/95 py-3 shadow-[0_8px_24px_rgba(45,12,21,0.22)] backdrop-blur-md border-b border-rose-200/15'
+          : 'bg-transparent py-5 border-b border-transparent'
+      }`}
+    >
+      <div className="flex w-full items-center justify-between gap-6 px-5 sm:px-8 lg:px-12 xl:px-16 text-white">
+        {/* Clean Editorial Logo (No box, no badge clutter) */}
+        <button
+          type="button"
+          onClick={() => {
+            setActiveNav('home');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="flex items-center gap-2.5 text-left group focus:outline-none"
         >
-          {/* Minimalist Gold-Rose Torii SVG */}
           <svg
             viewBox="0 0 36 32"
             fill="none"
-            className="h-8 w-9 text-amber-200 transition-transform duration-300 group-hover:scale-105"
+            className="h-7 w-8 text-amber-200 transition-opacity duration-200 group-hover:opacity-85"
           >
             <path d="M2 6C10 9.5 26 9.5 34 6L33 9.5C25 12 11 12 3 9.5L2 6Z" fill="currentColor" />
-            <rect x="6" y="13" width="24" height="2.6" rx="1" fill="#fda4af" />
-            <rect x="9.5" y="9" width="3.2" height="21" rx="1" fill="currentColor" />
-            <rect x="23.3" y="9" width="3.2" height="21" rx="1" fill="currentColor" />
-            <rect x="16.5" y="9.5" width="3" height="5" fill="#fb7185" />
+            <rect x="6" y="13" width="24" height="2.4" fill="#fda4af" />
+            <rect x="9.5" y="9" width="3" height="21" fill="currentColor" />
+            <rect x="23.5" y="9" width="3" height="21" fill="currentColor" />
+            <rect x="16.5" y="9.5" width="3" height="4.8" fill="#fb7185" />
           </svg>
 
-          <div className="leading-tight">
-            <div className="font-display text-lg font-bold tracking-wide text-amber-50 group-hover:text-rose-200 transition-colors">
+          <div className="leading-none">
+            <span className="block font-display text-lg sm:text-xl font-bold tracking-wide text-amber-50">
               Kami no Sū
-            </div>
-            <div className="font-jp text-[10px] tracking-[0.42em] text-rose-200/80">
+            </span>
+            <span className="mt-1 block font-jp text-[10px] tracking-[0.42em] text-rose-200/80">
               神の数
-            </div>
+            </span>
           </div>
-        </div>
+        </button>
 
-        {/* Desktop Centered Navigation */}
-        <nav className="hidden md:flex items-center gap-7 text-sm font-medium">
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="relative py-1 text-amber-100 after:absolute after:inset-x-0 after:-bottom-1 after:h-0.5 after:rounded-full after:bg-rose-300 transition-colors"
-          >
-            Trang chủ
-          </button>
-          <button
-            onClick={onScrollToOmikuji}
-            className="py-1 text-rose-100/80 hover:text-amber-200 transition-colors"
-          >
-            Rút quẻ
-          </button>
-          <button
-            onClick={onOpenTarotDraw}
-            className="py-1 text-rose-100/80 hover:text-amber-200 transition-colors"
-          >
-            Tarot Omikuji
-          </button>
-          <button
-            onClick={onOpenNumerology}
-            className="py-1 text-rose-100/80 hover:text-amber-200 transition-colors"
-          >
-            Thần số học
-          </button>
-          <button
-            onClick={onOpenSaved}
-            className="py-1 text-rose-100/80 hover:text-amber-200 transition-colors"
-          >
-            Bộ sưu tập
-          </button>
+        {/* Airy Editorial Center Navigation (No pill dock, no heavy boxes) */}
+        <nav aria-label="Điều hướng chính" className="hidden md:flex items-center gap-8 lg:gap-10">
+          {navItems.map((item) => {
+            const isActive = activeNav === item.key;
+            return (
+              <button
+                key={item.key}
+                type="button"
+                onClick={item.action}
+                className={`relative py-1 text-sm font-medium tracking-wide transition-colors duration-200 ${
+                  isActive
+                    ? 'text-amber-100'
+                    : 'text-rose-100/75 hover:text-white'
+                }`}
+              >
+                {item.label}
+                <span
+                  className={`absolute inset-x-0 -bottom-0.5 h-[1.5px] bg-gradient-to-r from-transparent via-amber-200 to-transparent transition-opacity duration-300 ${
+                    isActive ? 'opacity-100' : 'opacity-0'
+                  }`}
+                />
+              </button>
+            );
+          })}
         </nav>
 
-        {/* Right Actions */}
-        <div className="flex items-center gap-2.5 sm:gap-3">
-          {/* Audio Toggle */}
+        {/* Minimal Borderless Right Utilities */}
+        <div className="flex items-center gap-4 sm:gap-5">
           <button
+            type="button"
             onClick={toggleSound}
-            title={soundOn ? 'Tắt âm thanh đền thần' : 'Bật âm thanh đền thần'}
-            className="grid h-8 w-8 place-items-center rounded-full border border-rose-200/25 bg-white/10 text-rose-100 hover:border-amber-200 hover:text-amber-200 transition-colors"
+            title={soundOn ? 'Tắt âm thanh' : 'Bật âm thanh'}
+            className="text-rose-100/80 hover:text-amber-200 transition-colors focus:outline-none"
           >
-            {soundOn ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4 opacity-60" />}
+            {soundOn ? <Volume2 className="h-[18px] w-[18px]" /> : <VolumeX className="h-[18px] w-[18px] opacity-50" />}
           </button>
 
-          {/* Saved Fortunes Pill */}
           <button
-            onClick={onOpenSaved}
-            className="relative flex items-center gap-1.5 rounded-full border border-rose-200/30 bg-white/10 px-3 py-1.5 text-xs font-semibold text-rose-50 hover:border-amber-200 hover:bg-white/15 transition-all"
+            type="button"
+            onClick={() => {
+              setActiveNav('saved');
+              onOpenSaved();
+            }}
+            title="Bộ sưu tập quẻ đã lưu"
+            className="relative flex items-center gap-1.5 text-sm font-medium text-rose-100/85 hover:text-amber-200 transition-colors focus:outline-none"
           >
-            <Bookmark className="h-3.5 w-3.5 text-amber-200" />
-            <span className="hidden sm:inline">Đã lưu</span>
+            <Bookmark className="h-[18px] w-[18px]" />
             {savedCount > 0 && (
-              <span className="grid h-4 min-w-4 place-items-center rounded-full bg-crimson-500 px-1 text-[10px] font-bold text-white">
-                {savedCount}
-              </span>
+              <span className="text-xs font-bold text-amber-200">{savedCount}</span>
             )}
           </button>
 
-          {/* Notification Bell + Cute Miko Seal Avatar */}
           <button
-            onClick={onOpenNumerology}
-            title="Thông điệp hôm nay"
-            className="relative hidden sm:grid h-8 w-8 place-items-center rounded-full text-rose-100/85 hover:text-amber-200 transition-colors"
+            type="button"
+            onClick={() => {
+              setActiveNav('omikuji');
+              onScrollToOmikuji();
+            }}
+            className="hidden sm:inline-block text-sm font-semibold tracking-wide text-amber-200 hover:text-white transition-colors relative pb-0.5 after:absolute after:inset-x-0 after:bottom-0 after:h-[1px] after:bg-amber-200/70 hover:after:bg-white"
           >
-            <Bell className="h-4 w-4" />
-            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-rose-400 ring-2 ring-[#3a151e]" />
-          </button>
-
-          <button
-            onClick={onOpenNumerology}
-            title="Hồ sơ Thần số học"
-            className="grid h-9 w-9 place-items-center rounded-full border-2 border-amber-200/80 bg-gradient-to-br from-rose-300 via-crimson-400 to-crimson-600 font-jp text-sm font-bold text-white shadow-sm hover:scale-105 transition-transform"
-          >
-            巫
+            Lắc hũ ngay
           </button>
         </div>
       </div>
