@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #fdf6f3;
+    color: #3b1d22;
+    font-family: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+  }
+}
+
+/* Subtle Japanese Seigaiha Wave Background */
+.seigaiha-bg {
+  background-color: #fdf6f3;
+  background-image:
+    radial-gradient(circle at 100% 150%, #fdf6f3 24%, rgba(232, 83, 102, 0.05) 24%, rgba(232, 83, 102, 0.05) 28%, #fdf6f3 28%, #fdf6f3 36%, rgba(232, 83, 102, 0.05) 36%, rgba(232, 83, 102, 0.05) 40%, transparent 40%, transparent),
+    radial-gradient(circle at 0 150%, #fdf6f3 24%, rgba(232, 83, 102, 0.05) 24%, rgba(232, 83, 102, 0.05) 28%, #fdf6f3 28%, #fdf6f3 36%, rgba(232, 83, 102, 0.05) 36%, rgba(232, 83, 102, 0.05) 40%, transparent 40%, transparent),
+    radial-gradient(circle at 50% 100%, #fdf6f3 10%, rgba(232, 83, 102, 0.05) 10%, rgba(232, 83, 102, 0.05) 23%, #fdf6f3 23%, #fdf6f3 30%, rgba(232, 83, 102, 0.05) 30%, rgba(232, 83, 102, 0.05) 43%, #fdf6f3 43%, #fdf6f3 50%, rgba(232, 83, 102, 0.05) 50%, rgba(232, 83, 102, 0.05) 63%, #fdf6f3 63%, #fdf6f3 71%, transparent 71%, transparent),
+    radial-gradient(circle at 100% 50%, #fdf6f3 5%, rgba(232, 83, 102, 0.05) 5%, rgba(232, 83, 102, 0.05) 15%, #fdf6f3 15%, #fdf6f3 20%, rgba(232, 83, 102, 0.05) 20%, rgba(232, 83, 102, 0.05) 29%, #fdf6f3 29%, #fdf6f3 34%, rgba(232, 83, 102, 0.05) 34%, rgba(232, 83, 102, 0.05) 44%, #fdf6f3 44%, #fdf6f3 49%, transparent 49%, transparent),
+    radial-gradient(circle at 0 50%, #fdf6f3 5%, rgba(232, 83, 102, 0.05) 5%, rgba(232, 83, 102, 0.05) 15%, #fdf6f3 15%, #fdf6f3 20%, rgba(232, 83, 102, 0.05) 20%, rgba(232, 83, 102, 0.05) 29%, #fdf6f3 29%, #fdf6f3 34%, rgba(232, 83, 102, 0.05) 34%, rgba(232, 83, 102, 0.05) 44%, #fdf6f3 44%, #fdf6f3 49%, transparent 49%, transparent);
+  background-size: 64px 32px;
+}
+
+/* Warm Japanese Washi Paper Card */
+.washi-card {
+  background: linear-gradient(180deg, #fffdfb 0%, #fff6f3 100%);
+  border: 1.5px solid #f2cfd2;
+  box-shadow: 0 10px 30px -10px rgba(181, 43, 63, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  position: relative;
+}
+
+.washi-card-featured {
+  background: linear-gradient(150deg, #ef6676 0%, #e04558 55%, #c93347 100%);
+  border: 1.5px solid #f7b0b8;
+  box-shadow: 0 14px 32px -8px rgba(212, 60, 80, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+/* Japanese Decorative Inner Frame */
+.jp-inner-frame {
+  border: 1px solid rgba(212, 60, 80, 0.18);
+  border-radius: 10px;
+}
+
+.vertical {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+}
+
+/* 3D Flip Card Helpers */
+.perspective-1000 {
+  perspective: 1100px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Custom Soft Rose Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #fdf6f3;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #f0a8b0;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e85366;
+}
