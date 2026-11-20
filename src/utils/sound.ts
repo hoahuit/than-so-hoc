@@ -16,16 +16,44 @@ class ShrineAudioEngine {
       this.ctx = new AudioCtx();
     }
     if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
+      this.ctx.resume().catch(() => {});
     }
+  }
+
+  // iOS Safari / Chrome mobile unlock trick
+  public async unlock(): Promise<boolean> {
+    this.initCtx();
+    if (!this.ctx) return false;
+    if (this.ctx.state === 'suspended') {
+      try {
+        await this.ctx.resume();
+      } catch {
+        return false;
+      }
+    }
+    try {
+      const buffer = this.ctx.createBuffer(1, 1, 22050);
+      const source = this.ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(this.ctx.destination);
+      source.start(0);
+    } catch {
+      // ignore
+    }
+    return this.ctx.state === 'running';
   }
 
   // ===== AMBIENT JAPANESE BACKGROUND MUSIC =====
   // Generates a looping lofi ambient track with koto-like plucks, shakuhachi pads, and gentle rain
-  startBackgroundMusic() {
-    if (this.bgMusicPlaying) return;
-    this.initCtx();
-    if (!this.ctx) return;
+  async startBackgroundMusic(): Promise<boolean> {
+    if (this.bgMusicPlaying) {
+      if (this.ctx && this.ctx.state === 'suspended') {
+        await this.unlock();
+      }
+      return true;
+    }
+    await this.unlock();
+    if (!this.ctx) return false;
 
     this.bgMusicPlaying = true;
     const ctx = this.ctx;
@@ -185,6 +213,7 @@ class ShrineAudioEngine {
     };
 
     playPhrase();
+    return true;
   }
 
   stopBackgroundMusic() {

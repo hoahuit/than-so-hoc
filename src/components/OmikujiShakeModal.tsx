@@ -148,7 +148,8 @@ export const OmikujiShakeModal: React.FC<OmikujiShakeModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label="Nghi thức lắc hũ rút quẻ Omikuji"
-      className="fixed inset-0 z-50 flex flex-col seigaiha-bg overflow-y-auto"
+      className="fixed inset-0 z-[90] flex flex-col bg-[#fdf6f3] seigaiha-bg overflow-y-auto"
+      style={{ position: 'fixed', top: 0, right: 0, bottom: 0, left: 0 }}
     >
       {/* Ambient Soft Coral-Rose Radial Glows */}
       <div className="pointer-events-none fixed -top-24 left-1/2 h-96 w-[640px] -translate-x-1/2 rounded-full bg-rose-300/35 blur-3xl" />

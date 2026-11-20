@@ -21,7 +21,6 @@
     radial-gradient(circle at 100% 50%, #fdf6f3 5%, rgba(232, 83, 102, 0.05) 5%, rgba(232, 83, 102, 0.05) 15%, #fdf6f3 15%, #fdf6f3 20%, rgba(232, 83, 102, 0.05) 20%, rgba(232, 83, 102, 0.05) 29%, #fdf6f3 29%, #fdf6f3 34%, rgba(232, 83, 102, 0.05) 34%, rgba(232, 83, 102, 0.05) 44%, #fdf6f3 44%, #fdf6f3 49%, transparent 49%, transparent),
     radial-gradient(circle at 0 50%, #fdf6f3 5%, rgba(232, 83, 102, 0.05) 5%, rgba(232, 83, 102, 0.05) 15%, #fdf6f3 15%, #fdf6f3 20%, rgba(232, 83, 102, 0.05) 20%, rgba(232, 83, 102, 0.05) 29%, #fdf6f3 29%, #fdf6f3 34%, rgba(232, 83, 102, 0.05) 34%, rgba(232, 83, 102, 0.05) 44%, #fdf6f3 44%, #fdf6f3 49%, transparent 49%, transparent);
   background-size: 64px 32px;
-  position: relative;
 }
 
 /* Animated aurora overlay on page */

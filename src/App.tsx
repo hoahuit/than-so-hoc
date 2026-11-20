@@ -41,35 +41,40 @@ export function App() {
   const [musicOn, setMusicOn] = useState<boolean>(false);
   const autoStartedRef = useRef(false);
 
-  const handleToggleMusic = useCallback(() => {
+  const handleToggleMusic = useCallback(async () => {
     if (!musicOn) {
-      shrineAudio.startBackgroundMusic();
-      setMusicOn(true);
+      const ok = await shrineAudio.startBackgroundMusic();
+      if (ok) setMusicOn(true);
     } else {
       shrineAudio.stopBackgroundMusic();
       setMusicOn(false);
     }
   }, [musicOn]);
 
-  // Auto-start music on first user interaction (browsers require this)
+  // Auto-start music on first genuine user interaction (pointerdown / touchend / click)
   useEffect(() => {
-    const startOnInteraction = () => {
+    const startOnInteraction = async () => {
       if (autoStartedRef.current) return;
-      autoStartedRef.current = true;
-      shrineAudio.startBackgroundMusic();
-      setMusicOn(true);
+      
+      const unlocked = await shrineAudio.unlock();
+      if (unlocked) {
+        autoStartedRef.current = true;
+        await shrineAudio.startBackgroundMusic();
+        setMusicOn(true);
+        window.removeEventListener('pointerdown', startOnInteraction);
+        window.removeEventListener('touchend', startOnInteraction);
+        window.removeEventListener('click', startOnInteraction);
+      }
     };
 
-    window.addEventListener('click', startOnInteraction, { once: true });
-    window.addEventListener('touchstart', startOnInteraction, { once: true });
-    window.addEventListener('keydown', startOnInteraction, { once: true });
-    window.addEventListener('scroll', startOnInteraction, { once: true });
+    window.addEventListener('pointerdown', startOnInteraction, { passive: true });
+    window.addEventListener('touchend', startOnInteraction, { passive: true });
+    window.addEventListener('click', startOnInteraction, { passive: true });
 
     return () => {
+      window.removeEventListener('pointerdown', startOnInteraction);
+      window.removeEventListener('touchend', startOnInteraction);
       window.removeEventListener('click', startOnInteraction);
-      window.removeEventListener('touchstart', startOnInteraction);
-      window.removeEventListener('keydown', startOnInteraction);
-      window.removeEventListener('scroll', startOnInteraction);
     };
   }, []);
 
