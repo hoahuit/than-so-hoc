@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Sparkles, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { PetalsCanvas } from './components/PetalsCanvas';
 import { Header } from './components/Header';
@@ -36,6 +36,42 @@ export function App() {
       return [];
     }
   });
+
+  // ===== BACKGROUND MUSIC STATE =====
+  const [musicOn, setMusicOn] = useState<boolean>(false);
+  const autoStartedRef = useRef(false);
+
+  const handleToggleMusic = useCallback(() => {
+    if (!musicOn) {
+      shrineAudio.startBackgroundMusic();
+      setMusicOn(true);
+    } else {
+      shrineAudio.stopBackgroundMusic();
+      setMusicOn(false);
+    }
+  }, [musicOn]);
+
+  // Auto-start music on first user interaction (browsers require this)
+  useEffect(() => {
+    const startOnInteraction = () => {
+      if (autoStartedRef.current) return;
+      autoStartedRef.current = true;
+      shrineAudio.startBackgroundMusic();
+      setMusicOn(true);
+    };
+
+    window.addEventListener('click', startOnInteraction, { once: true });
+    window.addEventListener('touchstart', startOnInteraction, { once: true });
+    window.addEventListener('keydown', startOnInteraction, { once: true });
+    window.addEventListener('scroll', startOnInteraction, { once: true });
+
+    return () => {
+      window.removeEventListener('click', startOnInteraction);
+      window.removeEventListener('touchstart', startOnInteraction);
+      window.removeEventListener('keydown', startOnInteraction);
+      window.removeEventListener('scroll', startOnInteraction);
+    };
+  }, []);
 
   useEffect(() => {
     try {
@@ -147,6 +183,8 @@ export function App() {
         onScrollToOmikuji={handleOpenShakeModal}
         onOpenTarotDraw={() => scrollToElement('tarot-omikuji-section')}
         savedCount={savedFortunes.length}
+        musicOn={musicOn}
+        onToggleMusic={handleToggleMusic}
       />
 
       {/* ================= HERO BANNER (ANIME SHRINE MAIDEN & TORII) ================= */}
@@ -163,18 +201,22 @@ export function App() {
         <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#2b0d16]/75 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#38131d]/50 to-transparent" />
 
+        {/* Animated glow orbs */}
+        <div className="pointer-events-none absolute top-1/4 left-1/4 h-72 w-72 rounded-full bg-rose-500/10 blur-[80px] animate-pulse" />
+        <div className="pointer-events-none absolute bottom-1/3 left-1/3 h-48 w-48 rounded-full bg-amber-400/8 blur-[60px]" style={{animation: 'auroraShift 10s ease-in-out infinite alternate'}} />
+
         {/* Hero Foreground Content */}
         <div className="relative z-20 w-full px-5 pt-28 pb-14 sm:px-8 sm:pt-32 md:pt-36 md:pb-20 lg:px-12 lg:pt-40 lg:pb-24 xl:px-16">
           <div className="max-w-2xl">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-rose-200/35 bg-white/10 px-3.5 py-1 backdrop-blur-sm">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-rose-200/35 bg-white/10 px-3.5 py-1 backdrop-blur-sm shimmer-sweep">
               <span className="font-jp text-xs font-semibold tracking-[0.28em] text-amber-100">
                 おみくじ × 数秘術 · タロット
               </span>
             </div>
 
-            <h1 className="font-display text-4xl font-bold tracking-tight text-amber-50 sm:text-5xl md:text-[54px] leading-[1.12] drop-shadow-[0_4px_18px_rgba(0,0,0,0.35)]">
+            <h1 className="font-display text-4xl font-bold tracking-tight text-amber-50 sm:text-5xl md:text-[54px] leading-[1.12] hero-title-glow">
               Kami no Sū{' '}
-              <span className="font-jp font-medium text-rose-200">– 神の数</span>
+              <span className="font-jp font-medium text-rose-200 text-glow-rose">– 神の数</span>
             </h1>
 
             <p className="mt-3 text-base sm:text-lg font-semibold text-rose-100">
@@ -189,19 +231,35 @@ export function App() {
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <button
                 onClick={handleOpenShakeModal}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#f26979] via-[#e64b5e] to-[#d93d50] px-7 py-3 text-sm font-bold text-white shadow-[0_8px_24px_rgba(232,83,102,0.5)] transition-all hover:-translate-y-0.5 hover:brightness-105 active:scale-95"
+                className="relative inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#f26979] via-[#e64b5e] to-[#d93d50] px-7 py-3 text-sm font-bold text-white shadow-[0_8px_28px_rgba(232,83,102,0.55)] transition-all hover:-translate-y-1 hover:shadow-[0_12px_36px_rgba(232,83,102,0.65)] active:scale-95 shimmer-sweep"
               >
+                {/* Pulse ring */}
+                <span className="absolute inset-0 rounded-full bg-crimson-400/30 animate-pulse-ring" />
                 <span>Rút quẻ ngay</span>
-                <Sparkles className="h-4 w-4 text-amber-200" />
+                <Sparkles className="h-4 w-4 text-amber-200 animate-spin-slow" />
               </button>
 
               <button
                 onClick={() => setIsNumerologyOpen(true)}
-                className="inline-flex items-center justify-center gap-1 rounded-full border border-amber-200/75 bg-white/15 px-6 py-3 text-sm font-semibold text-amber-50 backdrop-blur-sm transition-all hover:bg-white/25 hover:border-amber-200"
+                className="inline-flex items-center justify-center gap-1 rounded-full border border-amber-200/75 bg-white/15 px-6 py-3 text-sm font-semibold text-amber-50 backdrop-blur-sm transition-all hover:bg-white/25 hover:border-amber-200 hover:-translate-y-0.5"
               >
                 <span>Khám phá thần số học</span>
                 <ChevronRight className="h-4 w-4" />
               </button>
+            </div>
+
+            {/* Stats row */}
+            <div className="mt-6 flex flex-wrap gap-5">
+              {[
+                { icon: '🌸', label: '50+ Lá quẻ độc đáo' },
+                { icon: '✨', label: 'Tarot Nhật Bản' },
+                { icon: '🔢', label: 'Thần số học' },
+              ].map((stat) => (
+                <div key={stat.label} className="flex items-center gap-1.5 text-xs text-rose-100/70">
+                  <span>{stat.icon}</span>
+                  <span>{stat.label}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -264,13 +322,17 @@ export function App() {
       </main>
 
       {/* ================= FOOTER ================= */}
-      <footer className="relative z-20 hidden border-t border-rose-200/80 bg-[#fff8f6] py-6 text-center text-xs text-ink-muted md:block">
+      <footer className="relative z-20 hidden border-t border-rose-200/80 py-6 text-center text-xs text-ink-muted md:block" style={{background: 'linear-gradient(180deg, #fff8f6 0%, #fdf0ef 100%)'}}>
         <div className="flex w-full flex-col items-center justify-between gap-2 px-6 lg:px-10 xl:px-14 sm:flex-row">
           <div className="flex items-center gap-2">
-            <span className="font-jp text-sm font-bold text-crimson-600">神の数</span>
+            <span className="font-jp text-sm font-bold text-crimson-600 text-glow-rose">神の数</span>
             <span>· Kami no Sū © 2026 · Rút quẻ Omikuji &amp; Tarot Nhật Bản</span>
           </div>
-          <p>Mang lại năng lượng tích cực, niềm vui và cảm hứng mỗi ngày 🌸</p>
+          <p className="flex items-center gap-1.5">
+            <span className="animate-twinkle text-rose-400">🌸</span>
+            Mang lại năng lượng tích cực, niềm vui và cảm hứng mỗi ngày
+            <span className="animate-twinkle-slow text-amber-400" style={{animationDelay:'1s'}}>✨</span>
+          </p>
         </div>
       </footer>
 

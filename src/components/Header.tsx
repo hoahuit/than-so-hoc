@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX, Bookmark } from 'lucide-react';
+import { Volume2, VolumeX, Bookmark, Music, Music2 } from 'lucide-react';
 import { shrineAudio } from '../utils/sound';
 
 interface HeaderProps {
@@ -8,6 +8,8 @@ interface HeaderProps {
   onScrollToOmikuji: () => void;
   onOpenTarotDraw: () => void;
   savedCount: number;
+  musicOn: boolean;
+  onToggleMusic: () => void;
 }
 
 type NavKey = 'home' | 'omikuji' | 'tarot' | 'numerology' | 'saved';
@@ -18,6 +20,8 @@ export const Header: React.FC<HeaderProps> = ({
   onScrollToOmikuji,
   onOpenTarotDraw,
   savedCount,
+  musicOn,
+  onToggleMusic,
 }) => {
   const [soundOn, setSoundOn] = useState<boolean>(true);
   const [activeNav, setActiveNav] = useState<NavKey>('home');
@@ -88,12 +92,12 @@ export const Header: React.FC<HeaderProps> = ({
     <header
       className={`fixed inset-x-0 top-0 z-40 w-full transition-all duration-300 ${
         isScrolled
-          ? 'bg-[#3d131e]/95 py-3 shadow-[0_8px_24px_rgba(45,12,21,0.22)] backdrop-blur-md border-b border-rose-200/15'
-          : 'bg-transparent py-5 border-b border-transparent'
+          ? 'bg-[#240a12]/95 py-3 shadow-[0_12px_36px_rgba(20,5,10,0.5),0_1px_0_rgba(254,205,211,0.18)] backdrop-blur-xl border-b border-rose-300/25'
+          : 'bg-gradient-to-b from-[#2a0c15]/60 via-[#2a0c15]/25 to-transparent py-4 sm:py-5 border-b border-white/5 backdrop-blur-[2px]'
       }`}
     >
       <div className="flex w-full items-center justify-between gap-6 px-5 sm:px-8 lg:px-12 xl:px-16 text-white">
-        {/* Clean Editorial Logo (No box, no badge clutter) */}
+        {/* Clean Editorial Logo */}
         <button
           type="button"
           onClick={() => {
@@ -105,7 +109,7 @@ export const Header: React.FC<HeaderProps> = ({
           <svg
             viewBox="0 0 36 32"
             fill="none"
-            className="h-7 w-8 text-amber-200 transition-opacity duration-200 group-hover:opacity-85"
+            className="h-7 w-8 text-amber-200 transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_rgba(253,230,138,0.7)]"
           >
             <path d="M2 6C10 9.5 26 9.5 34 6L33 9.5C25 12 11 12 3 9.5L2 6Z" fill="currentColor" />
             <rect x="6" y="13" width="24" height="2.4" fill="#fda4af" />
@@ -115,17 +119,17 @@ export const Header: React.FC<HeaderProps> = ({
           </svg>
 
           <div className="leading-none">
-            <span className="block font-display text-lg sm:text-xl font-bold tracking-wide text-amber-50">
+            <span className="block font-display text-xl sm:text-2xl font-bold tracking-wide text-amber-50 text-glow-gold">
               Kami no Sū
             </span>
-            <span className="mt-1 block font-jp text-[10px] tracking-[0.42em] text-rose-200/80">
+            <span className="mt-1 block font-jp text-[11px] tracking-[0.45em] text-rose-200/90 font-medium">
               神の数
             </span>
           </div>
         </button>
 
-        {/* Airy Editorial Center Navigation (No pill dock, no heavy boxes) */}
-        <nav aria-label="Điều hướng chính" className="hidden md:flex items-center gap-8 lg:gap-10">
+        {/* Airy Editorial Center Navigation (Bigger & Sparkling Text) */}
+        <nav aria-label="Điều hướng chính" className="hidden md:flex items-center gap-2 lg:gap-3">
           {navItems.map((item) => {
             const isActive = activeNav === item.key;
             return (
@@ -133,16 +137,19 @@ export const Header: React.FC<HeaderProps> = ({
                 key={item.key}
                 type="button"
                 onClick={item.action}
-                className={`relative py-1 text-sm font-medium tracking-wide transition-colors duration-200 ${
+                className={`relative px-3.5 py-1.5 rounded-full text-[15px] lg:text-base font-semibold tracking-wide transition-all duration-200 group ${
                   isActive
-                    ? 'text-amber-100'
-                    : 'text-rose-100/75 hover:text-white'
+                    ? 'text-amber-200 text-glow-gold font-bold bg-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]'
+                    : 'text-rose-100/85 hover:text-amber-200 hover:text-glow-gold hover:bg-white/5'
                 }`}
               >
-                {item.label}
+                <span className="relative z-10 flex items-center gap-1">
+                  {isActive && <span className="text-[11px] text-amber-300 animate-twinkle">✦</span>}
+                  <span>{item.label}</span>
+                </span>
                 <span
-                  className={`absolute inset-x-0 -bottom-0.5 h-[1.5px] bg-gradient-to-r from-transparent via-amber-200 to-transparent transition-opacity duration-300 ${
-                    isActive ? 'opacity-100' : 'opacity-0'
+                  className={`absolute inset-x-2.5 -bottom-0.5 h-[2px] bg-gradient-to-r from-transparent via-amber-300 to-transparent shadow-[0_0_8px_rgba(253,230,138,0.9)] transition-opacity duration-300 ${
+                    isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-60'
                   }`}
                 />
               </button>
@@ -152,13 +159,35 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Minimal Borderless Right Utilities */}
         <div className="flex items-center gap-4 sm:gap-5">
+          {/* Music Toggle Button */}
+          <button
+            type="button"
+            onClick={onToggleMusic}
+            title={musicOn ? 'Tắt nhạc nền' : 'Bật nhạc nền Nhật Bản'}
+            className={`relative flex items-center gap-1 transition-all focus:outline-none p-1.5 rounded-full hover:bg-white/10 ${
+              musicOn
+                ? 'text-amber-200 drop-shadow-[0_0_8px_rgba(253,230,138,0.8)]'
+                : 'text-rose-100/70 hover:text-amber-200'
+            }`}
+          >
+            {musicOn ? (
+              <>
+                <Music2 className="h-5 w-5" />
+                {/* Animated music notes */}
+                <span className="animate-bounce-note absolute -top-1.5 -right-1 text-[10px] text-amber-200 select-none pointer-events-none font-bold">♪</span>
+              </>
+            ) : (
+              <Music className="h-5 w-5 opacity-60" />
+            )}
+          </button>
+
           <button
             type="button"
             onClick={toggleSound}
-            title={soundOn ? 'Tắt âm thanh' : 'Bật âm thanh'}
-            className="text-rose-100/80 hover:text-amber-200 transition-colors focus:outline-none"
+            title={soundOn ? 'Tắt âm thanh hiệu ứng' : 'Bật âm thanh hiệu ứng'}
+            className="text-rose-100/80 hover:text-amber-200 transition-colors focus:outline-none p-1.5 rounded-full hover:bg-white/10"
           >
-            {soundOn ? <Volume2 className="h-[18px] w-[18px]" /> : <VolumeX className="h-[18px] w-[18px] opacity-50" />}
+            {soundOn ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5 opacity-50" />}
           </button>
 
           <button
@@ -168,11 +197,13 @@ export const Header: React.FC<HeaderProps> = ({
               onOpenSaved();
             }}
             title="Bộ sưu tập quẻ đã lưu"
-            className="relative flex items-center gap-1.5 text-sm font-medium text-rose-100/85 hover:text-amber-200 transition-colors focus:outline-none"
+            className="relative flex items-center gap-1.5 text-sm font-semibold text-rose-100/90 hover:text-amber-200 transition-colors focus:outline-none p-1.5 rounded-full hover:bg-white/10"
           >
-            <Bookmark className="h-[18px] w-[18px]" />
+            <Bookmark className="h-5 w-5" />
             {savedCount > 0 && (
-              <span className="text-xs font-bold text-amber-200">{savedCount}</span>
+              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-crimson-500 px-1 text-[10px] font-bold text-white shadow-sm">
+                {savedCount}
+              </span>
             )}
           </button>
 
@@ -182,9 +213,10 @@ export const Header: React.FC<HeaderProps> = ({
               setActiveNav('omikuji');
               onScrollToOmikuji();
             }}
-            className="hidden sm:inline-block text-sm font-semibold tracking-wide text-amber-200 hover:text-white transition-colors relative pb-0.5 after:absolute after:inset-x-0 after:bottom-0 after:h-[1px] after:bg-amber-200/70 hover:after:bg-white"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#f26979] to-[#d93d50] px-4 py-1.5 text-[13px] font-bold text-white shadow-coral-glow hover:brightness-110 hover:scale-105 active:scale-95 transition-all shimmer-sweep"
           >
-            Lắc hũ ngay
+            <span>Lắc hũ ngay</span>
+            <span className="text-amber-200">✦</span>
           </button>
         </div>
       </div>

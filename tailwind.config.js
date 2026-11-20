@@ -59,6 +59,11 @@ export default {
         'shake': 'shake 0.55s cubic-bezier(.36,.07,.19,.97) both',
         'stick-eject': 'stickEject 0.85s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
         'shimmer': 'shimmer 2.5s linear infinite',
+        'glow-pulse': 'glowPulse 2.5s ease-in-out infinite',
+        'float-up': 'floatUp 3s ease-out infinite',
+        'twinkle': 'starTwinkle 2.5s ease-in-out infinite',
+        'bounce-note': 'bounceNote 1.1s ease-in-out infinite',
+        'gradient-shift': 'gradientShift 6s ease-in-out infinite alternate',
       },
       keyframes: {
         spinReverse: {
@@ -87,6 +92,27 @@ export default {
         shimmer: {
           '0%': { backgroundPosition: '-200% 0' },
           '100%': { backgroundPosition: '200% 0' },
+        },
+        glowPulse: {
+          '0%, 100%': { boxShadow: '0 0 15px rgba(232, 83, 102, 0.3), 0 0 30px rgba(232, 83, 102, 0.1)' },
+          '50%': { boxShadow: '0 0 25px rgba(232, 83, 102, 0.55), 0 0 50px rgba(232, 83, 102, 0.25)' },
+        },
+        floatUp: {
+          '0%':   { transform: 'translateY(0) opacity(0)', opacity: '0' },
+          '20%':  { opacity: '1' },
+          '100%': { transform: 'translateY(-60px)', opacity: '0' },
+        },
+        starTwinkle: {
+          '0%, 100%': { opacity: '0.3', transform: 'scale(0.8)' },
+          '50%': { opacity: '1', transform: 'scale(1.2)' },
+        },
+        bounceNote: {
+          '0%, 100%': { transform: 'translateY(0) rotate(-15deg) scale(1)', opacity: '0.9' },
+          '50%': { transform: 'translateY(-5px) rotate(5deg) scale(1.2)', opacity: '1' },
+        },
+        gradientShift: {
+          '0%': { backgroundPosition: '0% 50%' },
+          '100%': { backgroundPosition: '100% 50%' },
         },
       },
     },
