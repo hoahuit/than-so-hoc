@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Sparkles, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import { PetalsCanvas } from './components/PetalsCanvas';
 import { Header } from './components/Header';
 import { MarqueeBanner } from './components/MarqueeBanner';
+import { HeroOmikujiSection } from './components/HeroOmikujiSection';
 import { PlansCarousel } from './components/PlansCarousel';
-import { OmikujiBoxInteractive } from './components/OmikujiBoxInteractive';
 import { OmikujiShakeModal } from './components/OmikujiShakeModal';
 import { TarotOmikujiDeck } from './components/TarotOmikujiDeck';
 import { FortuneCardDisplay } from './components/FortuneCardDisplay';
@@ -41,7 +41,7 @@ export function App() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(savedFortunes));
     } catch {
-      // Ignore storage quota errors
+      // Ignore quota errors
     }
   }, [savedFortunes]);
 
@@ -55,26 +55,17 @@ export function App() {
   const scrollToElement = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
+  const handleFortuneDrawn = useCallback((fortune: OmikujiFortune) => {
+    setCurrentFortune(fortune);
+    setFlipVersion((prev) => prev + 1);
+  }, []);
+
   const handleOpenShakeModal = useCallback(() => {
     setIsShakeModalOpen(true);
-  }, []);
-
-  const handleFortuneDrawnFromModal = useCallback((fortune: OmikujiFortune) => {
-    setCurrentFortune(fortune);
-    setFlipVersion((prev) => prev + 1);
-  }, []);
-
-  const handleFortunePickedFromTarot = useCallback((fortune: OmikujiFortune) => {
-    setCurrentFortune(fortune);
-    setFlipVersion((prev) => prev + 1);
-    setTimeout(() => {
-      const el = document.getElementById('fortune-result-section');
-      el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }, 280);
   }, []);
 
   const isFortuneSaved = useCallback(
@@ -86,7 +77,7 @@ export function App() {
 
   const handleSaveFortune = (fortune: OmikujiFortune) => {
     if (isFortuneSaved(fortune)) {
-      showToast('Lá quẻ này đã có trong bộ sưu tập của bạn!');
+      showToast('Lá quẻ này đã có trong sổ xăm của bạn!');
       return;
     }
 
@@ -102,25 +93,25 @@ export function App() {
       fortune,
     };
     setSavedFortunes((prev) => [newEntry, ...prev]);
-    showToast(`Đã lưu quẻ ${fortune.rank} (#${fortune.stickNumber}) vào bộ sưu tập!`);
+    showToast(`Đã lưu Quẻ Số ${fortune.stickNumber} (${fortune.rank}) vào sổ xăm!`);
   };
 
   const handleRemoveSaved = (uid: string) => {
     setSavedFortunes((prev) => prev.filter((item) => item.uid !== uid));
-    showToast('Đã xóa lá quẻ khỏi bộ sưu tập.');
+    showToast('Đã xóa quẻ xăm khỏi sổ xăm.');
   };
 
   const handleShareFortune = async (fortune: OmikujiFortune) => {
-    const shareText = `🌸 Kami no Sū (神の数) - Quẻ Omikuji & Tarot của tôi:\n✦ Cấp độ: ${fortune.rank} (${fortune.kanjiRank}) - Thẻ #${fortune.stickNumber}\n✦ "${fortune.title}"\n📜 ${fortune.poem.join(' / ')}\n❤️ Tình duyên: ${fortune.scores.love}% | 💼 Sự nghiệp: ${fortune.scores.career}% | 💰 Tài lộc: ${fortune.scores.wealth}%\nRút quẻ may mắn hôm nay tại Kami no Sū!`;
+    const shareText = `⛩️ XĂM MAY MẮN - Đền Thần Asakusa Nhật Bản:\n✦ Quẻ Số ${fortune.stickNumber} (${fortune.kanjiRank} · ${fortune.rank})\n✦ "${fortune.title}"\n📜 ${fortune.poem.join(' / ')}\n❤️ Tình duyên: ${fortune.scores.love}% | 💰 Tài lộc: ${fortune.scores.wealth}% | 💼 Sự nghiệp: ${fortune.scores.career}%\nXin xăm may mắn ngay hôm nay!`;
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Kami no Sū – Quẻ ${fortune.rank} (${fortune.kanjiRank})`,
+          title: `Xăm May Mắn – Quẻ Số ${fortune.stickNumber} (${fortune.rank})`,
           text: shareText,
           url: window.location.href,
         });
-        showToast('Đã chia sẻ kết quả quẻ thành công!');
+        showToast('Đã chia sẻ quẻ xăm thành công!');
         return;
       } catch {
         // Fallback to clipboard
@@ -129,152 +120,96 @@ export function App() {
 
     try {
       await navigator.clipboard.writeText(`${shareText}\n${window.location.href}`);
-      showToast('Đã sao chép kết quả quẻ & liên kết vào bộ nhớ tạm!');
+      showToast('Đã sao chép lời xăm & liên kết vào bộ nhớ tạm!');
     } catch {
-      showToast('Không thể sao chép tự động, bạn có thể chụp màn hình lá quẻ nhé!');
+      showToast('Bạn có thể chụp màn hình quẻ xăm để chia sẻ nhé!');
     }
   };
 
   return (
-    <div className="relative min-h-screen seigaiha-bg text-ink selection:bg-crimson-500 selection:text-white">
-      {/* Gentle Floating Sakura Petals */}
+    <div className="relative min-h-screen temple-bg text-ink selection:bg-temple-800 selection:text-white">
+      {/* Subtle Floating Petals Canvas */}
       <PetalsCanvas />
 
-      {/* Sticky Top Header */}
+      {/* Transparent-to-Solid Header */}
       <Header
         onOpenNumerology={() => setIsNumerologyOpen(true)}
         onOpenSaved={() => setIsSavedOpen(true)}
-        onScrollToOmikuji={handleOpenShakeModal}
-        onOpenTarotDraw={() => scrollToElement('tarot-omikuji-section')}
+        onScrollToOmikuji={() => scrollToElement('hero-omikuji-section')}
+        onOpenTarotDraw={() => scrollToElement('tarot-section')}
         savedCount={savedFortunes.length}
       />
 
-      {/* ================= HERO BANNER (ANIME SHRINE MAIDEN & TORII) ================= */}
-      <section className="relative overflow-hidden bg-[#38131d]">
-        {/* Custom Anime Key Visual Background */}
-        <img
-          src="/images/hero-shrine.jpg"
-          alt="Thiếu nữ đền thần Kami no Sū bên cổng Torii dưới trăng rằm và hoa anh đào"
-          className="absolute inset-0 h-full w-full object-cover object-right md:object-[center_20%]"
+      {/* ================= 1. HERO SECTION: 70% BIG OMIKUJI BOX + 30% TITLE ================= */}
+      <div id="hero-omikuji-section">
+        <HeroOmikujiSection
+          selectedPlan={selectedPlan}
+          onSelectPlan={setSelectedPlan}
+          onFortuneDrawn={handleFortuneDrawn}
         />
+      </div>
 
-        {/* Soft Rose-Burgundy Scrim on Left & Subtle Top Vignette for Floating Transparent Header */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#38131d]/95 via-[#491926]/70 to-transparent md:via-[#491926]/55" />
-        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#2b0d16]/75 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#38131d]/50 to-transparent" />
-
-        {/* Hero Foreground Content */}
-        <div className="relative z-20 w-full px-5 pt-28 pb-14 sm:px-8 sm:pt-32 md:pt-36 md:pb-20 lg:px-12 lg:pt-40 lg:pb-24 xl:px-16">
-          <div className="max-w-2xl">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-rose-200/35 bg-white/10 px-3.5 py-1 backdrop-blur-sm">
-              <span className="font-jp text-xs font-semibold tracking-[0.28em] text-amber-100">
-                おみくじ × 数秘術 · タロット
-              </span>
-            </div>
-
-            <h1 className="font-display text-4xl font-bold tracking-tight text-amber-50 sm:text-5xl md:text-[54px] leading-[1.12] drop-shadow-[0_4px_18px_rgba(0,0,0,0.35)]">
-              Kami no Sū{' '}
-              <span className="font-jp font-medium text-rose-200">– 神の数</span>
-            </h1>
-
-            <p className="mt-3 text-base sm:text-lg font-semibold text-rose-100">
-              Thế giới rút quẻ Omikuji, Tarot &amp; thần số học Nhật Bản
-            </p>
-
-            <p className="mt-2 max-w-md text-xs sm:text-sm leading-relaxed text-rose-100/85">
-              Khám phá con số định mệnh, lắc hũ thẻ tre Omikuji tràn viền hoặc chọn lá bài Tarot thu hút bạn nhất để nhận thông điệp tươi sáng từ vũ trụ.
-            </p>
-
-            {/* Youthful Glowing Pill CTAs */}
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <button
-                onClick={handleOpenShakeModal}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#f26979] via-[#e64b5e] to-[#d93d50] px-7 py-3 text-sm font-bold text-white shadow-[0_8px_24px_rgba(232,83,102,0.5)] transition-all hover:-translate-y-0.5 hover:brightness-105 active:scale-95"
-              >
-                <span>Rút quẻ ngay</span>
-                <Sparkles className="h-4 w-4 text-amber-200" />
-              </button>
-
-              <button
-                onClick={() => setIsNumerologyOpen(true)}
-                className="inline-flex items-center justify-center gap-1 rounded-full border border-amber-200/75 bg-white/15 px-6 py-3 text-sm font-semibold text-amber-50 backdrop-blur-sm transition-all hover:bg-white/25 hover:border-amber-200"
-              >
-                <span>Khám phá thần số học</span>
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ================= SOFT SAKURA-RED KANJI MARQUEE ================= */}
+      {/* Traditional Temple Marquee Banner */}
       <MarqueeBanner />
 
-      {/* ================= MAIN BENTO DASHBOARD (FULL-WIDTH EDGE-TO-EDGE) ================= */}
-      <main className="relative z-20 w-full space-y-6 px-3 py-6 pb-28 sm:space-y-7 sm:px-6 sm:py-8 lg:px-10 xl:px-14 md:pb-14">
-        {/* TOP ROW: Plans (Left) + Omikuji Box (Right) */}
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:gap-7 lg:items-stretch">
+      {/* ================= 2. MAIN CONTENT: FOCUS ON LỜI XĂM & SỐ MAY MẮN ================= */}
+      <main className="relative z-20 w-full space-y-8 px-4 py-8 pb-28 sm:space-y-10 sm:px-6 sm:py-10 lg:px-10 xl:px-16 md:pb-16">
+        {/* LỜI QUẺ XĂM CHI TIẾT (Trọng tâm trải nghiệm) */}
+        <div id="fortune-result-section">
+          <FortuneCardDisplay
+            fortune={currentFortune}
+            plan={selectedPlan}
+            isSaved={isCurrentSaved}
+            onSave={handleSaveFortune}
+            onShare={handleShareFortune}
+            onRedraw={() => scrollToElement('hero-omikuji-section')}
+            flipVersion={flipVersion}
+          />
+        </div>
+
+        {/* 2 Cột Cân Đối: Chọn Ý Nguyện (Trái) + Con Số May Mắn Hôm Nay (Phải) */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-stretch">
           <div className="lg:col-span-6 flex flex-col justify-center">
             <PlansCarousel
               selectedPlan={selectedPlan}
               onSelectPlan={setSelectedPlan}
-              onScrollToDraw={handleOpenShakeModal}
+              onScrollToDraw={() => scrollToElement('hero-omikuji-section')}
             />
           </div>
 
           <div className="lg:col-span-6 flex">
             <div className="w-full flex">
-              <OmikujiBoxInteractive
-                selectedPlan={selectedPlan}
-                onOpenShakeModal={handleOpenShakeModal}
-                onScrollToTarot={() => scrollToElement('tarot-omikuji-section')}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* MIDDLE ROW: Interactive Lively Tarot-Omikuji Card Fan */}
-        <TarotOmikujiDeck
-          selectedPlan={selectedPlan}
-          onCardPicked={handleFortunePickedFromTarot}
-        />
-
-        {/* BOTTOM ROW: Daily Lucky Number (Left) + Fortune Result Card (Right) */}
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:gap-7 lg:items-stretch">
-          <div className="lg:col-span-4 flex">
-            <div className="w-full flex">
               <DailyFortune onOpenNumerology={() => setIsNumerologyOpen(true)} />
             </div>
           </div>
+        </div>
 
-          <div className="lg:col-span-8 flex">
-            <div className="w-full flex">
-              <FortuneCardDisplay
-                fortune={currentFortune}
-                plan={selectedPlan}
-                isSaved={isCurrentSaved}
-                onSave={handleSaveFortune}
-                onShare={handleShareFortune}
-                onRedraw={handleOpenShakeModal}
-                flipVersion={flipVersion}
-              />
-            </div>
-          </div>
+        {/* Trải Bài Tarot Omikuji (Lựa chọn bổ trợ thú vị) */}
+        <div id="tarot-section">
+          <TarotOmikujiDeck
+            selectedPlan={selectedPlan}
+            onCardPicked={(fortune) => {
+              handleFortuneDrawn(fortune);
+              scrollToElement('fortune-result-section');
+            }}
+          />
         </div>
       </main>
 
-      {/* ================= FOOTER ================= */}
-      <footer className="relative z-20 hidden border-t border-rose-200/80 bg-[#fff8f6] py-6 text-center text-xs text-ink-muted md:block">
-        <div className="flex w-full flex-col items-center justify-between gap-2 px-6 lg:px-10 xl:px-14 sm:flex-row">
+      {/* Footer */}
+      <footer className="relative z-20 hidden border-t border-temple-200 bg-[#f8f2e9] py-8 text-center text-xs text-ink-muted md:block">
+        <div className="flex w-full flex-col items-center justify-between gap-3 px-6 lg:px-12 xl:px-16 sm:flex-row">
           <div className="flex items-center gap-2">
-            <span className="font-jp text-sm font-bold text-crimson-600">神の数</span>
-            <span>· Kami no Sū © 2026 · Rút quẻ Omikuji &amp; Tarot Nhật Bản</span>
+            <span className="font-jp text-base font-bold text-temple-800">神の数</span>
+            <span className="font-semibold text-temple-900">· Xăm May Mắn Asakusa © 2026</span>
           </div>
-          <p>Mang lại năng lượng tích cực, niềm vui và cảm hứng mỗi ngày 🌸</p>
+          <p className="text-ink-muted">
+            Lắc xăm mang lại điềm lành, năng lượng tích cực &amp; sự bình an trong tâm hồn 🌸
+          </p>
         </div>
       </footer>
 
-      {/* ================= MOBILE FLOATING BOTTOM BAR ================= */}
+      {/* Mobile Floating Bottom Bar */}
       <FloatingBottomNav
         activeTab={activeMobileTab}
         onHome={() => {
@@ -286,7 +221,6 @@ export function App() {
           scrollToElement('plans-section');
         }}
         onQuickDraw={() => {
-          setActiveMobileTab('home');
           handleOpenShakeModal();
         }}
         onNumerology={() => {
@@ -300,23 +234,24 @@ export function App() {
         savedCount={savedFortunes.length}
       />
 
-      {/* ================= FULL-SCREEN OMIKUJI SHAKE RITUAL MODAL ================= */}
+      {/* Full-Screen Omikuji Shake Ritual Modal */}
       <OmikujiShakeModal
         isOpen={isShakeModalOpen}
         selectedPlan={selectedPlan}
         isFortuneSaved={isFortuneSaved}
         onClose={() => setIsShakeModalOpen(false)}
-        onFortuneRevealed={handleFortuneDrawnFromModal}
+        onFortuneRevealed={handleFortuneDrawn}
         onSaveFortune={handleSaveFortune}
         onShareFortune={handleShareFortune}
       />
 
-      {/* ================= MODALS & DRAWERS ================= */}
+      {/* Numerology Modal */}
       <NumerologyCalculatorModal
         isOpen={isNumerologyOpen}
         onClose={() => setIsNumerologyOpen(false)}
       />
 
+      {/* Saved Fortunes Drawer */}
       <SavedFortunesDrawer
         isOpen={isSavedOpen}
         onClose={() => setIsSavedOpen(false)}
@@ -329,11 +264,11 @@ export function App() {
         }}
       />
 
-      {/* ================= TOAST NOTIFICATION ================= */}
+      {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed left-1/2 top-20 z-[60] -translate-x-1/2 w-[90%] max-w-md">
-          <div className="flex items-center gap-2.5 rounded-full border border-rose-300 bg-white/95 px-4 py-2.5 text-xs sm:text-sm font-semibold text-crimson-700 shadow-washi-hover backdrop-blur-md">
-            <CheckCircle2 className="h-4 w-4 shrink-0 text-crimson-500" />
+          <div className="flex items-center gap-2.5 rounded-full border border-brass-400 bg-white/95 px-4 py-2.5 text-xs sm:text-sm font-semibold text-temple-900 shadow-temple-hover backdrop-blur-md">
+            <CheckCircle2 className="h-4 w-4 shrink-0 text-temple-700" />
             <span>{toastMessage}</span>
           </div>
         </div>

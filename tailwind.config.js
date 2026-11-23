@@ -7,36 +7,45 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Asakusa Sensoji Temple Palette
+        temple: {
+          50: '#fdf8f6',
+          100: '#faeee9',
+          200: '#f5dbd2',
+          300: '#ecbeae',
+          400: '#de9782',
+          500: '#cb6d53',
+          600: '#b84e35',
+          700: '#a33a24',
+          800: '#8b2a18', // Sensoji Vermilion Red
+          900: '#6e1e12', // Deep Temple Wood
+          950: '#3d0e08', // Dark Lacquer
+        },
+        brass: {
+          100: '#fbf4db',
+          200: '#f6e7b0',
+          300: '#ecd27e',
+          400: '#dfb84b',
+          500: '#cba135', // Temple Bell Brass Gold
+          600: '#a67d22',
+          700: '#7d5a15',
+        },
+        patina: {
+          800: '#1d463d', // Sensoji Bronze Green
+          900: '#14332c',
+        },
         washi: {
-          50: '#fffcfa',
-          100: '#fdf6f3',
-          200: '#faeae4',
-          300: '#f3d8cf',
-        },
-        crimson: {
-          50: '#fff1f2',
-          100: '#ffe4e6',
-          200: '#fecdd3',
-          300: '#fda4af',
-          400: '#fb7185',
-          500: '#e85366',
-          600: '#d43c50',
-          700: '#b52b3f',
-          800: '#7f1d2c',
-          900: '#4a121b',
-        },
-        gold: {
-          100: '#fef3c7',
-          200: '#fde68a',
-          300: '#fcd34d',
-          400: '#e5b869',
-          500: '#c99746',
-          600: '#a6762c',
+          50: '#fdfbf7',
+          100: '#f9f5ed',
+          200: '#f3ebd9',
+          300: '#ebdcc2',
+          800: '#322a24',
+          900: '#1c1714',
         },
         ink: {
-          DEFAULT: '#3b1d22',
-          muted: '#7a545b',
-          light: '#a47d84',
+          DEFAULT: '#261b1b',
+          muted: '#695555',
+          light: '#9e8585',
         },
       },
       fontFamily: {
@@ -45,10 +54,10 @@ export default {
         display: ['"Playfair Display"', '"Noto Serif JP"', 'serif'],
       },
       boxShadow: {
-        'washi': '0 10px 30px -8px rgba(181, 43, 63, 0.10), 0 2px 8px -2px rgba(181, 43, 63, 0.06)',
-        'washi-hover': '0 18px 36px -10px rgba(212, 60, 80, 0.22), 0 4px 12px -2px rgba(212, 60, 80, 0.12)',
-        'coral-glow': '0 8px 25px rgba(232, 83, 102, 0.35)',
-        'gold-soft': '0 8px 24px rgba(201, 151, 70, 0.3)',
+        'temple': '0 10px 30px -8px rgba(139, 42, 24, 0.16), 0 2px 8px -2px rgba(139, 42, 24, 0.08)',
+        'temple-hover': '0 18px 36px -10px rgba(163, 58, 36, 0.28), 0 4px 12px -2px rgba(163, 58, 36, 0.14)',
+        'temple-red': '0 8px 24px rgba(184, 78, 53, 0.4)',
+        'gold-glow': '0 8px 24px rgba(203, 161, 53, 0.35)',
       },
       animation: {
         'spin-slow': 'spin 28s linear infinite',

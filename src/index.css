@@ -4,42 +4,33 @@
 
 @layer base {
   body {
-    background-color: #fdf6f3;
-    color: #3b1d22;
+    background-color: #fbf8f3;
+    color: #261b1b;
     font-family: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
   }
 }
 
-/* Subtle Japanese Seigaiha Wave Background */
-.seigaiha-bg {
-  background-color: #fdf6f3;
-  background-image:
-    radial-gradient(circle at 100% 150%, #fdf6f3 24%, rgba(232, 83, 102, 0.05) 24%, rgba(232, 83, 102, 0.05) 28%, #fdf6f3 28%, #fdf6f3 36%, rgba(232, 83, 102, 0.05) 36%, rgba(232, 83, 102, 0.05) 40%, transparent 40%, transparent),
-    radial-gradient(circle at 0 150%, #fdf6f3 24%, rgba(232, 83, 102, 0.05) 24%, rgba(232, 83, 102, 0.05) 28%, #fdf6f3 28%, #fdf6f3 36%, rgba(232, 83, 102, 0.05) 36%, rgba(232, 83, 102, 0.05) 40%, transparent 40%, transparent),
-    radial-gradient(circle at 50% 100%, #fdf6f3 10%, rgba(232, 83, 102, 0.05) 10%, rgba(232, 83, 102, 0.05) 23%, #fdf6f3 23%, #fdf6f3 30%, rgba(232, 83, 102, 0.05) 30%, rgba(232, 83, 102, 0.05) 43%, #fdf6f3 43%, #fdf6f3 50%, rgba(232, 83, 102, 0.05) 50%, rgba(232, 83, 102, 0.05) 63%, #fdf6f3 63%, #fdf6f3 71%, transparent 71%, transparent),
-    radial-gradient(circle at 100% 50%, #fdf6f3 5%, rgba(232, 83, 102, 0.05) 5%, rgba(232, 83, 102, 0.05) 15%, #fdf6f3 15%, #fdf6f3 20%, rgba(232, 83, 102, 0.05) 20%, rgba(232, 83, 102, 0.05) 29%, #fdf6f3 29%, #fdf6f3 34%, rgba(232, 83, 102, 0.05) 34%, rgba(232, 83, 102, 0.05) 44%, #fdf6f3 44%, #fdf6f3 49%, transparent 49%, transparent),
-    radial-gradient(circle at 0 50%, #fdf6f3 5%, rgba(232, 83, 102, 0.05) 5%, rgba(232, 83, 102, 0.05) 15%, #fdf6f3 15%, #fdf6f3 20%, rgba(232, 83, 102, 0.05) 20%, rgba(232, 83, 102, 0.05) 29%, #fdf6f3 29%, #fdf6f3 34%, rgba(232, 83, 102, 0.05) 34%, rgba(232, 83, 102, 0.05) 44%, #fdf6f3 44%, #fdf6f3 49%, transparent 49%, transparent);
+/* Authentic Japanese Sensoji Temple Washi Texture */
+.temple-bg {
+  background-color: #fbf8f3;
+  background-image: 
+    radial-gradient(circle at 100% 150%, #fbf8f3 24%, rgba(163, 58, 36, 0.04) 24%, rgba(163, 58, 36, 0.04) 28%, #fbf8f3 28%, #fbf8f3 36%, rgba(163, 58, 36, 0.04) 36%, rgba(163, 58, 36, 0.04) 40%, transparent 40%),
+    radial-gradient(circle at 0 150%, #fbf8f3 24%, rgba(163, 58, 36, 0.04) 24%, rgba(163, 58, 36, 0.04) 28%, #fbf8f3 28%, #fbf8f3 36%, rgba(163, 58, 36, 0.04) 36%, rgba(163, 58, 36, 0.04) 40%, transparent 40%);
   background-size: 64px 32px;
 }
 
-/* Warm Japanese Washi Paper Card */
+/* Traditional Japanese Washi Card */
 .washi-card {
-  background: linear-gradient(180deg, #fffdfb 0%, #fff6f3 100%);
-  border: 1.5px solid #f2cfd2;
-  box-shadow: 0 10px 30px -10px rgba(181, 43, 63, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  background: linear-gradient(180deg, #ffffff 0%, #fcf9f2 100%);
+  border: 1.5px solid #ebd9d2;
+  box-shadow: 0 8px 26px -8px rgba(110, 30, 18, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   position: relative;
 }
 
 .washi-card-featured {
-  background: linear-gradient(150deg, #ef6676 0%, #e04558 55%, #c93347 100%);
-  border: 1.5px solid #f7b0b8;
-  box-shadow: 0 14px 32px -8px rgba(212, 60, 80, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-}
-
-/* Japanese Decorative Inner Frame */
-.jp-inner-frame {
-  border: 1px solid rgba(212, 60, 80, 0.18);
-  border-radius: 10px;
+  background: linear-gradient(150deg, #a33a24 0%, #8b2a18 60%, #6e1e12 100%);
+  border: 1.5px solid #d48a78;
+  box-shadow: 0 14px 34px -8px rgba(110, 30, 18, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .vertical {
@@ -64,23 +55,23 @@
   transform: rotateY(180deg);
 }
 
-/* Custom Soft Rose Scrollbar */
+/* Custom Temple Scrollbar */
 ::-webkit-scrollbar {
   width: 7px;
   height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #fdf6f3;
+  background: #fbf8f3;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #f0a8b0;
+  background: #de9782;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #e85366;
+  background: #a33a24;
 }
 
 /* ================= FULL-SCREEN OMIKUJI RITUAL ANIMATIONS ================= */

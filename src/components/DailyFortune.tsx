@@ -35,19 +35,19 @@ export const DailyFortune: React.FC<DailyFortuneProps> = ({ onOpenNumerology }) 
       id="daily-fortune-section"
       className="washi-card relative h-full w-full scroll-mt-24 flex flex-col justify-between overflow-hidden rounded-2xl p-5 sm:p-6"
     >
-      {/* Inner Japanese Frame */}
-      <div className="pointer-events-none absolute inset-1.5 rounded-xl border border-rose-200/70" />
+      {/* Inner Sacred Frame */}
+      <div className="pointer-events-none absolute inset-1.5 rounded-xl border border-temple-200/80" />
 
-      {/* Header with Diamond Dividers matching mockup */}
+      {/* Header */}
       <div className="relative z-10 mb-4">
         <div className="flex items-center justify-center gap-2.5">
-          <span className="h-px flex-1 bg-gradient-to-r from-transparent to-rose-300" />
-          <span className="h-1.5 w-1.5 rotate-45 bg-crimson-400" />
-          <h2 className="font-display text-lg sm:text-xl font-bold text-ink">
-            Con số may mắn hôm nay
+          <span className="h-px flex-1 bg-gradient-to-r from-transparent to-temple-300" />
+          <span className="h-1.5 w-1.5 rotate-45 bg-temple-700" />
+          <h2 className="font-display text-lg sm:text-xl font-bold text-temple-900">
+            Con Số May Mắn Hôm Nay
           </h2>
-          <span className="h-1.5 w-1.5 rotate-45 bg-crimson-400" />
-          <span className="h-px flex-1 bg-gradient-to-l from-transparent to-rose-300" />
+          <span className="h-1.5 w-1.5 rotate-45 bg-temple-700" />
+          <span className="h-px flex-1 bg-gradient-to-l from-transparent to-temple-300" />
         </div>
 
         {/* Date Bar */}
@@ -55,20 +55,20 @@ export const DailyFortune: React.FC<DailyFortuneProps> = ({ onOpenNumerology }) 
           <button
             onClick={handlePrevDay}
             aria-label="Ngày trước"
-            className="grid h-6 w-6 place-items-center rounded-full border border-rose-200 bg-white text-crimson-500 hover:bg-crimson-50 transition-colors"
+            className="grid h-6 w-6 place-items-center rounded-full border border-temple-200 bg-white text-temple-800 hover:bg-temple-50 transition-colors"
           >
             <ChevronLeft className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={handleResetToday}
-            className="rounded-full bg-rose-50 px-2.5 py-0.5 font-medium text-crimson-700 hover:bg-rose-100 transition-colors"
+            className="rounded-full bg-temple-50 px-3 py-0.5 font-semibold text-temple-800 hover:bg-temple-100 transition-colors"
           >
             {fortune.dateString}
           </button>
           <button
             onClick={handleNextDay}
             aria-label="Ngày sau"
-            className="grid h-6 w-6 place-items-center rounded-full border border-rose-200 bg-white text-crimson-500 hover:bg-crimson-50 transition-colors"
+            className="grid h-6 w-6 place-items-center rounded-full border border-temple-200 bg-white text-temple-800 hover:bg-temple-50 transition-colors"
           >
             <ChevronRight className="h-3.5 w-3.5" />
           </button>
@@ -79,10 +79,9 @@ export const DailyFortune: React.FC<DailyFortuneProps> = ({ onOpenNumerology }) 
       <div className="relative z-10 grid grid-cols-1 items-center gap-5 sm:grid-cols-[140px_1fr]">
         {/* Left: Circular Lucky Number Seal with Japanese Clouds */}
         <div className="relative mx-auto flex h-36 w-36 items-center justify-center">
-          {/* Decorative Japanese Clouds SVG */}
           <svg
             viewBox="0 0 160 160"
-            className="pointer-events-none absolute inset-0 h-full w-full text-rose-300/80"
+            className="pointer-events-none absolute inset-0 h-full w-full text-temple-300/70"
             fill="none"
           >
             <path
@@ -100,9 +99,9 @@ export const DailyFortune: React.FC<DailyFortuneProps> = ({ onOpenNumerology }) 
           </svg>
 
           {/* Outer Double Ring */}
-          <div className="grid h-28 w-28 place-items-center rounded-full border-2 border-rose-300 bg-white p-1.5 shadow-washi">
-            <div className="grid h-full w-full place-items-center rounded-full border border-amber-300/80 bg-gradient-to-br from-[#6b2131] via-[#8c273b] to-[#c93b4f] shadow-inner">
-              <span className="font-display text-5xl font-bold text-amber-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.25)]">
+          <div className="grid h-28 w-28 place-items-center rounded-full border-2 border-temple-300 bg-white p-1.5 shadow-temple">
+            <div className="grid h-full w-full place-items-center rounded-full border border-brass-400 bg-gradient-to-br from-[#8b2a18] via-[#a33a24] to-[#6e1e12] shadow-inner">
+              <span className="font-display text-5xl font-black text-brass-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
                 {fortune.luckyNumber}
               </span>
             </div>
@@ -110,15 +109,15 @@ export const DailyFortune: React.FC<DailyFortuneProps> = ({ onOpenNumerology }) 
         </div>
 
         {/* Right: 3 Crisp Rows */}
-        <dl className="divide-y divide-rose-200/75 text-sm">
+        <dl className="divide-y divide-temple-100 text-sm">
           <div className="flex items-center justify-between gap-2 py-2.5">
             <dt className="flex items-center gap-2 text-ink-muted">
-              <Flower2 className="h-4 w-4 text-crimson-500 shrink-0" />
-              <span>Màu sắc:</span>
+              <Flower2 className="h-4 w-4 text-temple-700 shrink-0" />
+              <span>Màu cát tường:</span>
             </dt>
-            <dd className="flex items-center gap-1.5 font-bold text-ink text-right">
+            <dd className="flex items-center gap-1.5 font-bold text-temple-900 text-right">
               <span
-                className="inline-block h-3 w-3 rounded-full border border-rose-200 shadow-sm shrink-0"
+                className="inline-block h-3 w-3 rounded-full border border-temple-200 shadow-sm shrink-0"
                 style={{ backgroundColor: fortune.luckyColor.hex }}
               />
               <span>{fortune.luckyColor.name}</span>
@@ -127,33 +126,33 @@ export const DailyFortune: React.FC<DailyFortuneProps> = ({ onOpenNumerology }) 
 
           <div className="flex items-center justify-between gap-2 py-2.5">
             <dt className="flex items-center gap-2 text-ink-muted">
-              <Mountain className="h-4 w-4 text-crimson-500 shrink-0" />
-              <span>Phương hướng:</span>
+              <Mountain className="h-4 w-4 text-temple-700 shrink-0" />
+              <span>Phương hướng tốt:</span>
             </dt>
-            <dd className="font-bold text-ink text-right">{shortDirection}</dd>
+            <dd className="font-bold text-temple-900 text-right">{shortDirection}</dd>
           </div>
 
           <div className="flex items-center justify-between gap-2 py-2.5">
             <dt className="flex items-center gap-2 text-ink-muted">
-              <Gem className="h-4 w-4 text-crimson-500 shrink-0" />
-              <span>Vật may mắn:</span>
+              <Gem className="h-4 w-4 text-temple-700 shrink-0" />
+              <span>Vật phẩm hộ mệnh:</span>
             </dt>
-            <dd className="font-bold text-crimson-700 text-right">{shortAmulet}</dd>
+            <dd className="font-bold text-temple-800 text-right">{shortAmulet}</dd>
           </div>
         </dl>
       </div>
 
       {/* Footer CTA to Open Full Numerology */}
-      <div className="relative z-10 mt-4 flex items-center justify-between gap-2 border-t border-rose-200/70 pt-3">
+      <div className="relative z-10 mt-4 flex items-center justify-between gap-2 border-t border-temple-200/80 pt-3">
         <span className="text-[11px] text-ink-muted truncate">
-          Nguyên tố: <strong className="text-ink">{fortune.element.split('(')[0]}</strong>
+          Nguyên tố: <strong className="text-temple-900">{fortune.element.split('(')[0]}</strong>
         </span>
         <button
           onClick={onOpenNumerology}
-          className="inline-flex items-center gap-1 rounded-full bg-crimson-50 px-3 py-1 text-[11px] font-bold text-crimson-600 border border-rose-200 hover:bg-crimson-500 hover:text-white transition-all shrink-0"
+          className="inline-flex items-center gap-1 rounded-full bg-temple-50 px-3 py-1 text-[11px] font-bold text-temple-800 border border-temple-200 hover:bg-temple-800 hover:text-white transition-all shrink-0"
         >
           <Sparkles className="h-3 w-3" />
-          <span>Xem Thần số học cá nhân</span>
+          <span>Tra Thần số học chi tiết</span>
         </button>
       </div>
     </section>

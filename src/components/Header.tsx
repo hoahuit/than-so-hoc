@@ -10,13 +10,12 @@ interface HeaderProps {
   savedCount: number;
 }
 
-type NavKey = 'home' | 'omikuji' | 'tarot' | 'numerology' | 'saved';
+type NavKey = 'home' | 'omikuji' | 'fortune' | 'numerology' | 'saved';
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenNumerology,
   onOpenSaved,
   onScrollToOmikuji,
-  onOpenTarotDraw,
   savedCount,
 }) => {
   const [soundOn, setSoundOn] = useState<boolean>(true);
@@ -52,23 +51,24 @@ export const Header: React.FC<HeaderProps> = ({
     },
     {
       key: 'omikuji',
-      label: 'Rút quẻ',
+      label: 'Lắc xăm',
       action: () => {
         setActiveNav('omikuji');
         onScrollToOmikuji();
       },
     },
     {
-      key: 'tarot',
-      label: 'Tarot Omikuji',
+      key: 'fortune',
+      label: 'Lời xăm',
       action: () => {
-        setActiveNav('tarot');
-        onOpenTarotDraw();
+        setActiveNav('fortune');
+        const el = document.getElementById('fortune-result-section');
+        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       },
     },
     {
       key: 'numerology',
-      label: 'Thần số học',
+      label: 'Số may mắn & Thần số',
       action: () => {
         setActiveNav('numerology');
         onOpenNumerology();
@@ -76,7 +76,7 @@ export const Header: React.FC<HeaderProps> = ({
     },
     {
       key: 'saved',
-      label: 'Bộ sưu tập',
+      label: 'Sổ xăm đã lưu',
       action: () => {
         setActiveNav('saved');
         onOpenSaved();
@@ -88,12 +88,12 @@ export const Header: React.FC<HeaderProps> = ({
     <header
       className={`fixed inset-x-0 top-0 z-40 w-full transition-all duration-300 ${
         isScrolled
-          ? 'bg-[#3d131e]/95 py-3 shadow-[0_8px_24px_rgba(45,12,21,0.22)] backdrop-blur-md border-b border-rose-200/15'
-          : 'bg-transparent py-5 border-b border-transparent'
+          ? 'bg-[#8b2a18]/95 py-3 shadow-[0_8px_24px_rgba(87,22,10,0.35)] backdrop-blur-md border-b border-[#cba135]/30 text-white'
+          : 'bg-gradient-to-b from-black/60 to-transparent py-4 sm:py-5 border-b border-transparent text-white'
       }`}
     >
-      <div className="flex w-full items-center justify-between gap-6 px-5 sm:px-8 lg:px-12 xl:px-16 text-white">
-        {/* Clean Editorial Logo (No box, no badge clutter) */}
+      <div className="flex w-full items-center justify-between gap-6 px-4 sm:px-8 lg:px-12 xl:px-16">
+        {/* Brand Name in Vietnamese (Clean, Authentic, No Box) */}
         <button
           type="button"
           onClick={() => {
@@ -102,30 +102,31 @@ export const Header: React.FC<HeaderProps> = ({
           }}
           className="flex items-center gap-2.5 text-left group focus:outline-none"
         >
+          {/* Minimalist Temple Bell / Torii SVG */}
           <svg
             viewBox="0 0 36 32"
             fill="none"
-            className="h-7 w-8 text-amber-200 transition-opacity duration-200 group-hover:opacity-85"
+            className="h-7 w-8 text-brass-300 transition-colors duration-200 group-hover:text-brass-200"
           >
             <path d="M2 6C10 9.5 26 9.5 34 6L33 9.5C25 12 11 12 3 9.5L2 6Z" fill="currentColor" />
-            <rect x="6" y="13" width="24" height="2.4" fill="#fda4af" />
+            <rect x="6" y="13" width="24" height="2.4" fill="#fde7b0" />
             <rect x="9.5" y="9" width="3" height="21" fill="currentColor" />
             <rect x="23.5" y="9" width="3" height="21" fill="currentColor" />
-            <rect x="16.5" y="9.5" width="3" height="4.8" fill="#fb7185" />
+            <rect x="16.5" y="9.5" width="3" height="4.8" fill="#ffffff" />
           </svg>
 
           <div className="leading-none">
-            <span className="block font-display text-lg sm:text-xl font-bold tracking-wide text-amber-50">
-              Kami no Sū
+            <span className="block font-display text-lg sm:text-xl font-extrabold tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
+              Xăm May Mắn
             </span>
-            <span className="mt-1 block font-jp text-[10px] tracking-[0.42em] text-rose-200/80">
-              神の数
+            <span className="mt-1 block font-jp text-[10px] tracking-[0.35em] text-brass-200/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+              神の数 · OMIKUJI
             </span>
           </div>
         </button>
 
-        {/* Airy Editorial Center Navigation (No pill dock, no heavy boxes) */}
-        <nav aria-label="Điều hướng chính" className="hidden md:flex items-center gap-8 lg:gap-10">
+        {/* Center Minimal Navigation */}
+        <nav aria-label="Điều hướng chính" className="hidden md:flex items-center gap-7 lg:gap-9">
           {navItems.map((item) => {
             const isActive = activeNav === item.key;
             return (
@@ -133,15 +134,15 @@ export const Header: React.FC<HeaderProps> = ({
                 key={item.key}
                 type="button"
                 onClick={item.action}
-                className={`relative py-1 text-sm font-medium tracking-wide transition-colors duration-200 ${
+                className={`relative py-1 text-sm font-semibold tracking-wide transition-colors duration-200 drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)] ${
                   isActive
-                    ? 'text-amber-100'
-                    : 'text-rose-100/75 hover:text-white'
+                    ? 'text-brass-300 font-bold'
+                    : 'text-white/85 hover:text-white'
                 }`}
               >
                 {item.label}
                 <span
-                  className={`absolute inset-x-0 -bottom-0.5 h-[1.5px] bg-gradient-to-r from-transparent via-amber-200 to-transparent transition-opacity duration-300 ${
+                  className={`absolute inset-x-0 -bottom-0.5 h-[2px] transition-opacity duration-300 bg-brass-300 ${
                     isActive ? 'opacity-100' : 'opacity-0'
                   }`}
                 />
@@ -150,41 +151,46 @@ export const Header: React.FC<HeaderProps> = ({
           })}
         </nav>
 
-        {/* Minimal Borderless Right Utilities */}
+        {/* Right Utilities */}
         <div className="flex items-center gap-4 sm:gap-5">
+          {/* Audio Toggle */}
           <button
             type="button"
             onClick={toggleSound}
-            title={soundOn ? 'Tắt âm thanh' : 'Bật âm thanh'}
-            className="text-rose-100/80 hover:text-amber-200 transition-colors focus:outline-none"
+            title={soundOn ? 'Tắt âm thanh đền chùa' : 'Bật âm thanh đền chùa'}
+            className="text-white/85 hover:text-brass-200 transition-colors focus:outline-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]"
           >
             {soundOn ? <Volume2 className="h-[18px] w-[18px]" /> : <VolumeX className="h-[18px] w-[18px] opacity-50" />}
           </button>
 
+          {/* Saved Fortunes */}
           <button
             type="button"
             onClick={() => {
               setActiveNav('saved');
               onOpenSaved();
             }}
-            title="Bộ sưu tập quẻ đã lưu"
-            className="relative flex items-center gap-1.5 text-sm font-medium text-rose-100/85 hover:text-amber-200 transition-colors focus:outline-none"
+            title="Sổ xăm đã lưu"
+            className="relative flex items-center gap-1.5 text-sm font-semibold text-white/85 hover:text-brass-200 transition-colors focus:outline-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]"
           >
             <Bookmark className="h-[18px] w-[18px]" />
             {savedCount > 0 && (
-              <span className="text-xs font-bold text-amber-200">{savedCount}</span>
+              <span className="text-xs font-bold text-brass-300">
+                {savedCount}
+              </span>
             )}
           </button>
 
+          {/* Fast Shake CTA */}
           <button
             type="button"
             onClick={() => {
               setActiveNav('omikuji');
               onScrollToOmikuji();
             }}
-            className="hidden sm:inline-block text-sm font-semibold tracking-wide text-amber-200 hover:text-white transition-colors relative pb-0.5 after:absolute after:inset-x-0 after:bottom-0 after:h-[1px] after:bg-amber-200/70 hover:after:bg-white"
+            className="hidden sm:inline-block text-xs sm:text-sm font-bold tracking-wide text-brass-200 hover:text-white transition-colors relative pb-0.5 after:absolute after:inset-x-0 after:bottom-0 after:h-[1.5px] after:bg-brass-300 drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)]"
           >
-            Lắc hũ ngay
+            Lắc xăm ngay
           </button>
         </div>
       </div>
