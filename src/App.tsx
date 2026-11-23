@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { PetalsCanvas } from './components/PetalsCanvas';
 import { Header } from './components/Header';
@@ -36,6 +36,47 @@ export function App() {
       return [];
     }
   });
+
+  // ===== BACKGROUND MUSIC STATE =====
+  const [musicOn, setMusicOn] = useState<boolean>(false);
+  const autoStartedRef = useRef(false);
+
+  const handleToggleMusic = useCallback(async () => {
+    if (!musicOn) {
+      const ok = await shrineAudio.startBackgroundMusic();
+      if (ok) setMusicOn(true);
+    } else {
+      shrineAudio.stopBackgroundMusic();
+      setMusicOn(false);
+    }
+  }, [musicOn]);
+
+  // Auto-start music on first genuine user interaction (pointerdown / touchend / click)
+  useEffect(() => {
+    const startOnInteraction = async () => {
+      if (autoStartedRef.current) return;
+
+      const unlocked = await shrineAudio.unlock();
+      if (unlocked) {
+        autoStartedRef.current = true;
+        await shrineAudio.startBackgroundMusic();
+        setMusicOn(true);
+        window.removeEventListener('pointerdown', startOnInteraction);
+        window.removeEventListener('touchend', startOnInteraction);
+        window.removeEventListener('click', startOnInteraction);
+      }
+    };
+
+    window.addEventListener('pointerdown', startOnInteraction, { passive: true });
+    window.addEventListener('touchend', startOnInteraction, { passive: true });
+    window.addEventListener('click', startOnInteraction, { passive: true });
+
+    return () => {
+      window.removeEventListener('pointerdown', startOnInteraction);
+      window.removeEventListener('touchend', startOnInteraction);
+      window.removeEventListener('click', startOnInteraction);
+    };
+  }, []);
 
   useEffect(() => {
     try {
@@ -138,6 +179,8 @@ export function App() {
         onScrollToOmikuji={() => scrollToElement('hero-omikuji-section')}
         onOpenTarotDraw={() => scrollToElement('tarot-section')}
         savedCount={savedFortunes.length}
+        musicOn={musicOn}
+        onToggleMusic={handleToggleMusic}
       />
 
       {/* ================= 1. HERO SECTION: 70% BIG OMIKUJI BOX + 30% TITLE ================= */}

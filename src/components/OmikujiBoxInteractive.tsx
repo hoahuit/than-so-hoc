@@ -22,13 +22,14 @@ export const OmikujiBoxInteractive: React.FC<OmikujiBoxInteractiveProps> = ({
   return (
     <section
       id="omikuji-box-section"
-      className="washi-card relative grid h-full w-full scroll-mt-24 items-center gap-4 overflow-hidden rounded-2xl p-5 sm:grid-cols-[1.05fr_1fr] sm:gap-6 sm:p-7"
+      className="washi-card magic-border relative grid h-full w-full scroll-mt-24 items-center gap-4 overflow-hidden rounded-2xl p-5 sm:grid-cols-[1.05fr_1fr] sm:gap-6 sm:p-7"
     >
       {/* Delicate Japanese Inner Border */}
       <div className="pointer-events-none absolute inset-1.5 rounded-xl border border-rose-200/70" />
 
-      {/* Warm Soft Sakura Aura */}
-      <div className="pointer-events-none absolute -left-8 -top-8 h-40 w-40 rounded-full bg-rose-200/45 blur-3xl" />
+      {/* Warm Soft Sakura Aura - enhanced */}
+      <div className="pointer-events-none absolute -left-8 -top-8 h-48 w-48 rounded-full bg-rose-200/50 blur-3xl animate-pulse" />
+      <div className="pointer-events-none absolute -right-10 -bottom-10 h-36 w-36 rounded-full bg-amber-200/25 blur-2xl" />
 
       {/* Left: Illustrated Sakura Omikuji Box (clickable to open Full-Screen Modal!) */}
       <div className="relative z-10 flex flex-col items-center justify-center">

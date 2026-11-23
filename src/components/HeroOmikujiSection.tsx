@@ -101,15 +101,10 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
 
       {/* ================= FOREGROUND HERO CONTENT ================= */}
       <div className="relative z-10 mx-auto w-full px-4 sm:px-8 lg:px-12 xl:px-16 flex flex-col items-center justify-between flex-1">
-        
+
         {/* ================= 30% TITLE & INTENT SELECTION ================= */}
         <div className="w-full max-w-2xl text-center flex flex-col items-center space-y-2.5 sm:space-y-3 mb-2">
-          {/* Sacred Japanese Badge */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-brass-400/40 bg-black/40 px-4 py-1 text-xs font-bold text-brass-200 backdrop-blur-md shadow-sm">
-            <span className="font-jp text-sm text-brass-300">御神籤</span>
-            <span>·</span>
-            <span>Đền Thần Asakusa Nhật Bản</span>
-          </div>
+
 
           {/* Main Title in Vietnamese */}
           <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight text-transparent bg-clip-text bg-gradient-to-r from-[#fff9ed] via-[#fde7b0] to-[#dfb84b] drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]">
@@ -118,7 +113,7 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
 
           {/* Concise Subtitle */}
           <p className="text-xs sm:text-sm text-amber-100/90 max-w-md mx-auto drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)] font-medium">
-            Lắc hũ xăm xin con số may mắn &amp; đón nhận lời sấm truyền định mệnh
+            Lắc hũ xăm xin con số may mắn &amp; đón nhận lời sấm truyền
           </p>
 
           {/* Intent Tabs */}
@@ -133,11 +128,10 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
                     shrineAudio.playShrineBell();
                     onSelectPlan(tab.id);
                   }}
-                  className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold backdrop-blur-md transition-all duration-200 ${
-                    isSelected
-                      ? 'bg-gradient-to-r from-temple-800 to-temple-700 text-amber-100 shadow-temple-red border border-brass-400 ring-1 ring-brass-400/50 scale-105'
-                      : 'bg-black/35 text-white/85 border border-white/20 hover:border-brass-300/60 hover:text-white hover:bg-black/50'
-                  }`}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold backdrop-blur-md transition-all duration-200 ${isSelected
+                    ? 'bg-gradient-to-r from-temple-800 to-temple-700 text-amber-100 shadow-temple-red border border-brass-400 ring-1 ring-brass-400/50 scale-105'
+                    : 'bg-black/35 text-white/85 border border-white/20 hover:border-brass-300/60 hover:text-white hover:bg-black/50'
+                    }`}
                 >
                   {tab.icon}
                   <span>{tab.label}</span>
@@ -162,32 +156,28 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
           >
             {/* Concentric Golden Halo Rings */}
             <div
-              className={`pointer-events-none absolute inset-6 sm:inset-4 rounded-full border border-dashed border-brass-400/50 transition-transform duration-700 ${
-                phase === 'shaking' ? 'animate-spin scale-110 border-brass-300' : 'animate-spin-slow'
-              }`}
+              className={`pointer-events-none absolute inset-6 sm:inset-4 rounded-full border border-dashed border-brass-400/50 transition-transform duration-700 ${phase === 'shaking' ? 'animate-spin scale-110 border-brass-300' : 'animate-spin-slow'
+                }`}
             />
             <div
-              className={`pointer-events-none absolute inset-16 sm:inset-12 rounded-full border border-brass-300/30 ${
-                phase === 'shaking' ? 'animate-ping opacity-50' : 'animate-spin-reverse-slow'
-              }`}
+              className={`pointer-events-none absolute inset-16 sm:inset-12 rounded-full border border-brass-300/30 ${phase === 'shaking' ? 'animate-ping opacity-50' : 'animate-spin-reverse-slow'
+                }`}
             />
 
             {/* Sacred Radiant Amber Glow behind Box */}
             <div
-              className={`pointer-events-none absolute h-64 w-64 sm:h-80 sm:w-80 rounded-full bg-gradient-to-tr from-temple-600/40 via-brass-400/35 to-amber-200/30 blur-3xl transition-transform duration-500 ${
-                phase === 'shaking' ? 'scale-135' : 'scale-100 group-hover:scale-110'
-              }`}
+              className={`pointer-events-none absolute h-64 w-64 sm:h-80 sm:w-80 rounded-full bg-gradient-to-tr from-temple-600/40 via-brass-400/35 to-amber-200/30 blur-3xl transition-transform duration-500 ${phase === 'shaking' ? 'scale-135' : 'scale-100 group-hover:scale-110'
+                }`}
             />
 
             {/* High-Resolution Omikuji Box Image (70% Visual Prominence) */}
             <div
-              className={`relative z-20 h-full w-full p-2 transition-transform duration-300 ${
-                phase === 'shaking'
-                  ? 'animate-ritual-shake'
-                  : phase === 'ejecting'
-                    ? 'animate-ritual-tilt'
-                    : 'animate-float group-hover:scale-105'
-              }`}
+              className={`relative z-20 h-full w-full p-2 transition-transform duration-300 ${phase === 'shaking'
+                ? 'animate-ritual-shake'
+                : phase === 'ejecting'
+                  ? 'animate-ritual-tilt'
+                  : 'animate-float group-hover:scale-105'
+                }`}
             >
               <img
                 src="/images/omikuji-box.png"
