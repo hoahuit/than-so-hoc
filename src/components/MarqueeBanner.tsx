@@ -2,13 +2,12 @@ import React from 'react';
 
 export const MarqueeBanner: React.FC = () => {
   const marqueeItems = [
-    { kanji: '大吉', text: 'ĐẠI CÁT ĐẮC THỜI' },
-    { kanji: 'おみくじ', text: 'XĂM MAY MẮN ASAKUSA' },
-    { kanji: '良縁', text: 'CẦU DUYÊN ĐẮC DUYÊN' },
-    { kanji: '金運招福', text: 'CẦU TÀI ĐẮC TÀI' },
-    { kanji: '神の数', text: 'THẦN SỐ ĐỊNH MỆNH' },
-    { kanji: '無病息災', text: 'BÌNH AN GIA ĐẠO' },
-    { kanji: '開運厄除', text: 'KHAI VẬN HANH THÔNG' },
+    { kanji: 'おみくじ', text: 'MỘT THÔNG ĐIỆP NGẪU NHIÊN DÀNH CHO BẠN LÚC NÀY' },
+    { kanji: '大吉', text: 'MAY MẮN NÀO ĐANG ĐẾN VỚI BẠN TRONG 30 NGÀY TỚI?' },
+    { kanji: '良縁', text: 'CHUYỆN TÌNH CẢM CỦA BẠN TỪ GIỜ TỚI CUỐI NĂM' },
+    { kanji: '金運', text: '30 NGÀY TỚI KHÍA CẠNH NÀO SẼ NỞ HOA?' },
+    { kanji: '神託', text: 'ĐIỀU BẠN THẦM MONG CẦU CÓ THÀNH SỰ THỰC?' },
+    { kanji: '開運', text: 'ĐOẠN ĐƯỜNG SẮP TỚI CỦA BẠN SẼ RA SAO?' },
   ];
 
   return (

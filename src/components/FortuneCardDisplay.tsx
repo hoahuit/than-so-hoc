@@ -105,7 +105,7 @@ export const FortuneCardDisplay: React.FC<FortuneCardDisplayProps> = ({
             
             {/* Main Center Ribbon */}
             <div className="relative flex items-center justify-center rounded-lg bg-gradient-to-r from-[#7a180b] via-[#9e2717] to-[#7a180b] px-6 sm:px-9 py-2 border-y-2 border-[#cba135] shadow-[0_4px_12px_rgba(122,24,11,0.35)]">
-              <span className="font-serif text-sm sm:text-base font-extrabold tracking-wider text-amber-100 drop-shadow-sm">
+              <span className="font-sans text-sm sm:text-base font-extrabold text-amber-100 drop-shadow-sm tracking-normal">
                 Kết Quả Quẻ Xăm
               </span>
             </div>
@@ -119,9 +119,9 @@ export const FortuneCardDisplay: React.FC<FortuneCardDisplayProps> = ({
         <div className="relative z-10 my-3 flex items-center justify-center gap-2 sm:gap-3 text-ink">
           <span className="h-[1px] w-10 sm:w-16 bg-gradient-to-r from-transparent to-[#cba135]" />
           <span className="text-xs text-[#cba135] select-none">☁</span>
-          <div className="font-serif text-base sm:text-lg text-[#3d1a15] flex items-center gap-1.5 font-bold">
+          <div className="font-sans text-base sm:text-lg text-[#3d1a15] flex items-center gap-1.5 font-bold">
             <span>Quẻ số</span>
-            <strong className="font-display text-2xl sm:text-3xl font-black text-[#8b2a18]">
+            <strong className="font-sans text-2xl sm:text-3xl font-black text-[#8b2a18]">
               {fortune.stickNumber}
             </strong>
           </div>
@@ -132,7 +132,7 @@ export const FortuneCardDisplay: React.FC<FortuneCardDisplayProps> = ({
         {/* 3. CALLIGRAPHY BRUSH CAPSULE: Đại Cát */}
         <div className="relative z-10 my-2 flex justify-center">
           <div className="relative inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#8b2a18] via-[#a33a24] to-[#8b2a18] px-8 sm:px-10 py-1.5 text-amber-50 shadow-[0_4px_12px_rgba(139,42,24,0.3)] border border-[#cba135]/40">
-            <span className="font-serif text-base sm:text-lg font-black tracking-[0.25em] pl-1">
+            <span className="font-sans text-base sm:text-lg font-black tracking-widest pl-1">
               {fortune.rank}
             </span>
           </div>
@@ -146,7 +146,7 @@ export const FortuneCardDisplay: React.FC<FortuneCardDisplayProps> = ({
           </div>
 
           <div className="rounded-2xl border border-[#ecdccb] bg-[#faf3e8]/75 p-4 sm:p-5 text-center shadow-xs">
-            <blockquote className="font-serif text-xs sm:text-sm italic leading-relaxed text-[#2c1410] space-y-1">
+            <blockquote className="font-sans text-xs sm:text-sm italic leading-relaxed text-[#2c1410] space-y-1">
               {fortune.poem.map((line, idx) => (
                 <p key={idx} className="block font-medium">
                   {idx === 0 ? `“${line}` : idx === fortune.poem.length - 1 ? `${line}”` : line}

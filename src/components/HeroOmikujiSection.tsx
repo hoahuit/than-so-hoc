@@ -13,9 +13,9 @@ interface HeroOmikujiSectionProps {
 type BoxPhase = 'idle' | 'shaking' | 'ejecting' | 'finished';
 
 const INTENT_TABS: { id: PlanType; label: string; icon: React.ReactNode }[] = [
-  { id: 'mini', label: 'Xăm Toàn Cảnh', icon: <Sparkles className="h-3.5 w-3.5 text-brass-300" /> },
-  { id: 'love', label: 'Xăm Tình Duyên', icon: <Heart className="h-3.5 w-3.5 text-rose-300" /> },
-  { id: 'destiny', label: 'Xăm Tài Lộc · Vận Mệnh', icon: <Coins className="h-3.5 w-3.5 text-amber-300" /> },
+  { id: 'mini', label: '✨ Thông điệp 30 ngày tới', icon: <Sparkles className="h-3.5 w-3.5 text-brass-300" /> },
+  { id: 'love', label: '💖 Tình cảm sắp tới', icon: <Heart className="h-3.5 w-3.5 text-rose-300" /> },
+  { id: 'destiny', label: '💼 Công việc & Tài chính', icon: <Coins className="h-3.5 w-3.5 text-amber-300" /> },
 ];
 
 export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
@@ -107,14 +107,19 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
 
 
           {/* Main Title in Vietnamese */}
-          <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight text-transparent bg-clip-text bg-gradient-to-r from-[#fff9ed] via-[#fde7b0] to-[#dfb84b] drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]">
-            Xăm May Mắn
+          <h1 className="font-sans text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight text-transparent bg-clip-text bg-gradient-to-r from-[#fff9ed] via-[#fde7b0] to-[#dfb84b] drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]">
+            Quẻ Xăm May Mắn
           </h1>
 
-          {/* Concise Subtitle */}
-          <p className="text-xs sm:text-sm text-amber-100/90 max-w-md mx-auto drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)] font-medium">
-            Lắc hũ xăm xin con số may mắn &amp; đón nhận lời sấm truyền
-          </p>
+          {/* Emotionally Engaging Subtitle based on Timeless Tarot Readings */}
+          <div className="space-y-1">
+            <p className="text-sm sm:text-base text-amber-100 font-bold drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)] tracking-wide">
+              Một thông điệp ngẫu nhiên dành riêng cho bạn lúc này ✨
+            </p>
+            <p className="text-xs text-amber-200/80 max-w-md mx-auto drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
+              Lắng nghe chỉ dẫn vũ trụ · Khám phá điều bất ngờ trong 30 ngày tới
+            </p>
+          </div>
 
           {/* Intent Tabs */}
           <div className="pt-1 flex flex-wrap items-center justify-center gap-2">
@@ -244,7 +249,7 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
 
             <p className="text-[11px] text-amber-100/85 flex items-center gap-1.5 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
               <ShieldCheck className="h-3.5 w-3.5 text-brass-300" />
-              <span>Chạm trực tiếp vào hũ xăm hoặc bấm Gieo Quẻ để xem kết quả</span>
+              <span>Chạm vào hũ xăm hoặc bấm Gieo Quẻ để xem khía cạnh nào sắp nở hoa</span>
             </p>
           </div>
         </div>

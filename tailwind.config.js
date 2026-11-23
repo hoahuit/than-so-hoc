@@ -50,8 +50,9 @@ export default {
       },
       fontFamily: {
         sans: ['"Be Vietnam Pro"', 'system-ui', 'sans-serif'],
+        serif: ['"Lora"', '"Be Vietnam Pro"', 'serif'],
+        display: ['"Lora"', '"Be Vietnam Pro"', 'serif'],
         jp: ['"Noto Serif JP"', 'serif'],
-        display: ['"Playfair Display"', '"Noto Serif JP"', 'serif'],
       },
       boxShadow: {
         'temple': '0 10px 30px -8px rgba(139, 42, 24, 0.16), 0 2px 8px -2px rgba(139, 42, 24, 0.08)',
