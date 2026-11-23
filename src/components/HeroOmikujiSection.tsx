@@ -246,7 +246,7 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
             </button>
 
             <p className="text-[11px] text-amber-100/80 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] tracking-wide">
-              Chạm vào hũ xăm hoặc bấm Gieo Quẻ để xem thông điệp
+              Chạm vào hũ xăm hoặc  Gieo Quẻ để xem thông điệp
             </p>
           </div>
         </div>
