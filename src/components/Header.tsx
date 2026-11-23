@@ -119,9 +119,6 @@ export const Header: React.FC<HeaderProps> = ({
           </svg>
 
           <div className="leading-none">
-            <span className="block font-sans text-lg sm:text-xl font-black tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
-              Linh Xăm Khai Vận
-            </span>
             <span className="mt-1 block font-jp text-[10px] tracking-[0.35em] text-brass-200/90 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
               神の数 · OMIKUJI
             </span>
