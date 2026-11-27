@@ -10,29 +10,45 @@ interface Angel3DProps {
   opacityRef: React.MutableRefObject<number>;
 }
 
-function createFeatherWingGeometry(): THREE.ShapeGeometry {
+/**
+ * Large dramatic arched Fallen Angel wing geometry:
+ * high shoulder arch sweeping down into layered feathered tips.
+ */
+function createArchedWingGeometry(): THREE.ShapeGeometry {
   const shape = new THREE.Shape();
-  shape.moveTo(0, 0);
-  shape.bezierCurveTo(0.28, 0.52, 0.85, 0.82, 1.18, 0.62);
-  shape.bezierCurveTo(0.98, 0.34, 0.8, 0.22, 0.96, 0.04);
-  shape.bezierCurveTo(0.7, -0.14, 0.52, -0.22, 0.66, -0.44);
-  shape.bezierCurveTo(0.35, -0.46, 0.16, -0.28, 0, -0.14);
+  shape.moveTo(0, 0.15);
+  shape.bezierCurveTo(0.28, 0.72, 0.72, 0.92, 1.12, 0.55);
+  shape.bezierCurveTo(1.38, 0.25, 1.52, -0.35, 1.42, -1.05);
+  // Scalloped primary feather tips
+  shape.lineTo(1.22, -0.82);
+  shape.lineTo(1.12, -1.12);
+  shape.lineTo(0.92, -0.78);
+  shape.lineTo(0.8, -1.02);
+  shape.lineTo(0.6, -0.68);
+  shape.lineTo(0.45, -0.85);
+  shape.lineTo(0.25, -0.5);
+  shape.bezierCurveTo(0.15, -0.32, 0.06, -0.15, 0, 0);
   shape.closePath();
 
-  const geo = new THREE.ShapeGeometry(shape, 12);
+  const geo = new THREE.ShapeGeometry(shape, 14);
   const pos = geo.getAttribute('position');
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i);
-    pos.setZ(i, -Math.pow(x, 1.45) * 0.16);
+    const y = pos.getY(i);
+    // Natural concave wing camber
+    pos.setZ(i, -Math.pow(Math.max(0, x), 1.35) * 0.18 + Math.abs(y) * 0.04);
   }
   geo.computeVertexNormals();
   return geo;
 }
 
 /**
- * Articulated 3D Celestial Angelic Shrine Maiden (procedural skeletal hierarchy)
- * with real depth testing/occlusion, feathered white-and-gold wings, flowing silver hair,
- * blinking eyes, hand gestures, and flight/idle animations.
+ * Articulated 3D Fallen Angel Queen inspired by dark-fantasy anime aesthetics:
+ * - Long flowing crimson-magenta hair & sleek obsidian horns
+ * - Dual-layered arched wings (obsidian outer + deep crimson inner)
+ * - Dark obsidian & antique-gold royal corset, open cape, thigh-high boots
+ * - Ornate golden scepter with glowing crimson-amber crystal core
+ * - Full skeletal hierarchy with blinking eyes, wing flapping, and 3D flight/present poses
  */
 export const Angel3D: React.FC<Angel3DProps> = ({
   angelGroupRef,
@@ -49,10 +65,10 @@ export const Angel3D: React.FC<Angel3DProps> = ({
   const leftWingRef = useRef<THREE.Group>(null);
   const rightWingRef = useRef<THREE.Group>(null);
   const backHairRef = useRef<THREE.Group>(null);
-  const skirtRef = useRef<THREE.Mesh>(null);
+  const capeRef = useRef<THREE.Mesh>(null);
   const auraRef = useRef<THREE.Group>(null);
 
-  const wingGeo = useMemo(() => createFeatherWingGeometry(), []);
+  const wingGeo = useMemo(() => createArchedWingGeometry(), []);
   useEffect(() => {
     return () => {
       wingGeo.dispose();
@@ -67,15 +83,13 @@ export const Angel3D: React.FC<Angel3DProps> = ({
       angelGroupRef.current.visible = opacityRef.current > 0.02;
     }
 
-    // Subtle vertical float
     if (bodyFloatRef.current) {
-      const floatAmp = mode === 'fly' ? 0.05 : 0.032;
-      bodyFloatRef.current.position.y = Math.sin(t * 2.1) * floatAmp;
+      const floatAmp = mode === 'fly' ? 0.05 : 0.03;
+      bodyFloatRef.current.position.y = Math.sin(t * 2.0) * floatAmp;
     }
 
-    // Upper body pitch (lean forward slightly during flight)
     if (upperBodyRef.current) {
-      const targetPitch = mode === 'fly' ? 0.22 : 0.02;
+      const targetPitch = mode === 'fly' ? 0.24 : 0.02;
       upperBodyRef.current.rotation.x = THREE.MathUtils.lerp(
         upperBodyRef.current.rotation.x,
         targetPitch + Math.sin(t * 1.6) * 0.02,
@@ -83,7 +97,6 @@ export const Angel3D: React.FC<Angel3DProps> = ({
       );
     }
 
-    // Head orientation & natural blinking
     if (headGroupRef.current) {
       const targetHeadY =
         mode === 'speak'
@@ -98,6 +111,7 @@ export const Angel3D: React.FC<Angel3DProps> = ({
       );
     }
 
+    // Natural eye blinking
     const blinkCycle = t % 3.6;
     const isBlinking = blinkCycle > 3.45 && blinkCycle < 3.58;
     const eyeY = isBlinking ? 0.08 : 1.0;
@@ -108,37 +122,37 @@ export const Angel3D: React.FC<Angel3DProps> = ({
       rightEyeRef.current.scale.y = THREE.MathUtils.lerp(rightEyeRef.current.scale.y, eyeY, 0.45);
     }
 
-    // Wing flapping (energetic during flight, serene in idle/present)
-    const flapSpeed = mode === 'fly' ? 6.2 : 2.6;
-    const flapAmp = mode === 'fly' ? 0.42 : 0.16;
+    // Dramatic wing flapping
+    const flapSpeed = mode === 'fly' ? 5.8 : 2.3;
+    const flapAmp = mode === 'fly' ? 0.42 : 0.14;
     const flap = Math.sin(t * flapSpeed) * flapAmp;
     if (leftWingRef.current) {
-      leftWingRef.current.rotation.y = -0.35 - flap;
+      leftWingRef.current.rotation.y = -0.32 - flap;
     }
     if (rightWingRef.current) {
-      rightWingRef.current.rotation.y = 0.35 + flap;
+      rightWingRef.current.rotation.y = 0.32 + flap;
     }
 
-    // Arm gestures: speak (gesture toward viewer), present (extend right hand toward jar), fly (swept back)
+    // Arm & Scepter gestures
     if (leftArmRef.current && rightArmRef.current) {
-      let targetLeftZ = 0.22;
-      let targetLeftX = 0.1;
+      let targetLeftZ = 0.18;
+      let targetLeftX = 0.08;
       let targetRightZ = -0.22;
-      let targetRightX = 0.1;
+      let targetRightX = -0.15;
 
       if (mode === 'speak') {
-        targetRightX = -0.78 + Math.sin(t * 2.5) * 0.06;
-        targetRightZ = -0.32;
-        targetLeftX = -0.25;
+        targetLeftX = -0.72 + Math.sin(t * 2.4) * 0.05;
+        targetLeftZ = 0.28;
+        targetRightX = -0.22;
       } else if (mode === 'fly') {
-        targetLeftX = 0.45;
-        targetRightX = 0.45;
-        targetLeftZ = 0.38;
-        targetRightZ = -0.38;
+        targetLeftX = 0.42;
+        targetRightX = 0.25;
+        targetLeftZ = 0.35;
+        targetRightZ = -0.32;
       } else if (mode === 'present') {
-        targetRightX = -0.68;
-        targetRightZ = -0.58;
-        targetLeftX = 0.08;
+        targetRightX = -0.58;
+        targetRightZ = -0.48;
+        targetLeftX = 0.12;
       }
 
       leftArmRef.current.rotation.x = THREE.MathUtils.lerp(leftArmRef.current.rotation.x, targetLeftX, 0.08);
@@ -147,166 +161,241 @@ export const Angel3D: React.FC<Angel3DProps> = ({
       rightArmRef.current.rotation.z = THREE.MathUtils.lerp(rightArmRef.current.rotation.z, targetRightZ, 0.08);
     }
 
-    // Flowing silver hair & skirt sway
     if (backHairRef.current) {
-      const hairPitch = mode === 'fly' ? 0.38 : 0.12;
+      const hairPitch = mode === 'fly' ? 0.4 : 0.12;
       backHairRef.current.rotation.x = THREE.MathUtils.lerp(
         backHairRef.current.rotation.x,
-        hairPitch + Math.sin(t * 2.1) * 0.05,
+        hairPitch + Math.sin(t * 2.0) * 0.05,
         0.08
       );
     }
-    if (skirtRef.current) {
-      skirtRef.current.rotation.z = Math.sin(t * 1.4) * 0.025;
+    if (capeRef.current) {
+      capeRef.current.rotation.x = 0.14 + Math.sin(t * 1.5) * 0.04;
     }
     if (auraRef.current) {
-      auraRef.current.rotation.y = t * 0.65;
+      auraRef.current.rotation.y = t * 0.6;
     }
   });
 
   return (
     <group ref={angelGroupRef} position={[0, 0, 2.2]}>
       <group ref={bodyFloatRef}>
-        {/* ===== LOWER ROBE (WHITE & ANTIQUE GOLD CELESTIAL HAKAMA) ===== */}
-        <mesh ref={skirtRef} position={[0, 0.48, 0]} castShadow receiveShadow>
-          <cylinderGeometry args={[0.21, 0.44, 0.98, 20]} />
-          <meshStandardMaterial color="#fdf8ec" roughness={0.48} metalness={0.12} />
-        </mesh>
-        {/* Gold Lower Hem Trim */}
-        <mesh position={[0, 0.04, 0]}>
-          <cylinderGeometry args={[0.425, 0.445, 0.09, 20]} />
-          <meshStandardMaterial color="#d4af37" metalness={0.85} roughness={0.22} />
-        </mesh>
-
-        {/* Gold Obi Waist Sash */}
-        <mesh position={[0, 0.96, 0]} castShadow>
-          <cylinderGeometry args={[0.21, 0.22, 0.14, 18]} />
-          <meshStandardMaterial color="#d4af37" metalness={0.88} roughness={0.2} />
-        </mesh>
-
-        {/* ===== UPPER BODY SKELETAL GROUP ===== */}
-        <group ref={upperBodyRef} position={[0, 1.02, 0]}>
-          {/* White & Gold Kimono Torso */}
+        {/* ===== LEGS & THIGH-HIGH OBSIDIAN BOOTS WITH GOLD GARTERS ===== */}
+        <group position={[-0.085, 0.45, 0]}>
           <mesh position={[0, 0.24, 0]} castShadow>
-            <cylinderGeometry args={[0.16, 0.2, 0.48, 16]} />
-            <meshStandardMaterial color="#ffffff" roughness={0.5} />
+            <cylinderGeometry args={[0.068, 0.058, 0.38, 12]} />
+            <meshStandardMaterial color="#ffe8dc" roughness={0.5} />
           </mesh>
-          {/* Gold Collar Trim */}
-          <mesh position={[0, 0.45, 0.05]} rotation={[0.25, 0, 0]}>
-            <torusGeometry args={[0.13, 0.022, 10, 24]} />
+          <mesh position={[0, -0.08, 0]} castShadow>
+            <cylinderGeometry args={[0.056, 0.042, 0.48, 12]} />
+            <meshStandardMaterial color="#190e14" roughness={0.35} metalness={0.25} />
+          </mesh>
+          <mesh position={[0, 0.16, 0]}>
+            <torusGeometry args={[0.058, 0.008, 8, 18]} />
             <meshStandardMaterial color="#d4af37" metalness={0.9} roughness={0.18} />
           </mesh>
+        </group>
 
-          {/* Left Arm & Flowing Celestial Sleeve */}
-          <group ref={leftArmRef} position={[-0.22, 0.36, 0.02]}>
-            <mesh position={[-0.06, -0.18, 0]} castShadow>
-              <boxGeometry args={[0.12, 0.42, 0.22]} />
-              <meshStandardMaterial color="#fdf8ec" roughness={0.5} />
+        <group position={[0.085, 0.45, 0]}>
+          <mesh position={[0, 0.24, 0]} castShadow>
+            <cylinderGeometry args={[0.068, 0.058, 0.38, 12]} />
+            <meshStandardMaterial color="#ffe8dc" roughness={0.5} />
+          </mesh>
+          <mesh position={[0, -0.08, 0]} castShadow>
+            <cylinderGeometry args={[0.056, 0.042, 0.48, 12]} />
+            <meshStandardMaterial color="#190e14" roughness={0.35} metalness={0.25} />
+          </mesh>
+          <mesh position={[0, 0.16, 0]}>
+            <torusGeometry args={[0.058, 0.008, 8, 18]} />
+            <meshStandardMaterial color="#d4af37" metalness={0.9} roughness={0.18} />
+          </mesh>
+        </group>
+
+        {/* ===== DARK ROYAL BELT & FLOWING OPEN CAPE ===== */}
+        <mesh position={[0, 0.88, 0]} castShadow>
+          <cylinderGeometry args={[0.16, 0.2, 0.14, 16]} />
+          <meshStandardMaterial color="#180c12" roughness={0.4} metalness={0.3} />
+        </mesh>
+        <mesh position={[0, 0.9, 0.02]}>
+          <torusGeometry args={[0.17, 0.012, 8, 24]} />
+          <meshStandardMaterial color="#d4af37" metalness={0.92} roughness={0.16} />
+        </mesh>
+
+        {/* Open Dark Burgundy-Obsidian Royal Cape */}
+        <mesh ref={capeRef} position={[0, 0.68, -0.14]} rotation={[0.14, 0, 0]} castShadow>
+          <cylinderGeometry args={[0.18, 0.48, 1.05, 16, 1, true, Math.PI * 0.65, Math.PI * 1.7]} />
+          <meshStandardMaterial
+            color="#3d0b18"
+            roughness={0.52}
+            metalness={0.2}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+
+        {/* ===== UPPER BODY: DARK CORSET & GOLD EMBELLISHMENTS ===== */}
+        <group ref={upperBodyRef} position={[0, 0.96, 0]}>
+          {/* Midriff & Corset */}
+          <mesh position={[0, 0.12, 0]}>
+            <cylinderGeometry args={[0.125, 0.145, 0.22, 16]} />
+            <meshStandardMaterial color="#ffe8dc" roughness={0.5} />
+          </mesh>
+          <mesh position={[0, 0.3, 0]} castShadow>
+            <cylinderGeometry args={[0.155, 0.13, 0.24, 16]} />
+            <meshStandardMaterial color="#180c12" roughness={0.38} metalness={0.35} />
+          </mesh>
+          {/* Gold Chest Emblem & Chains */}
+          <mesh position={[0, 0.32, 0.145]}>
+            <octahedronGeometry args={[0.032, 0]} />
+            <meshStandardMaterial color="#d946ef" emissive="#a21caf" emissiveIntensity={0.8} />
+          </mesh>
+          <mesh position={[0, 0.44, 0.04]} rotation={[0.25, 0, 0]}>
+            <torusGeometry args={[0.11, 0.016, 10, 24]} />
+            <meshStandardMaterial color="#d4af37" metalness={0.92} roughness={0.16} />
+          </mesh>
+
+          {/* Left Arm */}
+          <group ref={leftArmRef} position={[-0.19, 0.36, 0.02]}>
+            <mesh position={[-0.03, -0.16, 0]} castShadow>
+              <cylinderGeometry args={[0.042, 0.034, 0.34, 10]} />
+              <meshStandardMaterial color="#180c12" roughness={0.4} />
             </mesh>
-            <mesh position={[-0.06, -0.37, 0]}>
-              <boxGeometry args={[0.13, 0.05, 0.23]} />
-              <meshStandardMaterial color="#d4af37" metalness={0.85} roughness={0.22} />
-            </mesh>
-            <mesh position={[-0.06, -0.41, 0.02]}>
-              <sphereGeometry args={[0.045, 10, 10]} />
-              <meshStandardMaterial color="#fff1e6" roughness={0.55} />
+            <mesh position={[-0.03, -0.35, 0]}>
+              <sphereGeometry args={[0.038, 10, 10]} />
+              <meshStandardMaterial color="#ffe8dc" roughness={0.5} />
             </mesh>
           </group>
 
-          {/* Right Arm & Flowing Celestial Sleeve (Gesturing Hand) */}
-          <group ref={rightArmRef} position={[0.22, 0.36, 0.02]}>
-            <mesh position={[0.06, -0.18, 0]} castShadow>
-              <boxGeometry args={[0.12, 0.42, 0.22]} />
-              <meshStandardMaterial color="#fdf8ec" roughness={0.5} />
+          {/* Right Arm Holding Ornate Golden Scepter */}
+          <group ref={rightArmRef} position={[0.19, 0.36, 0.02]}>
+            <mesh position={[0.03, -0.16, 0]} castShadow>
+              <cylinderGeometry args={[0.042, 0.034, 0.34, 10]} />
+              <meshStandardMaterial color="#180c12" roughness={0.4} />
             </mesh>
-            <mesh position={[0.06, -0.37, 0]}>
-              <boxGeometry args={[0.13, 0.05, 0.23]} />
-              <meshStandardMaterial color="#d4af37" metalness={0.85} roughness={0.22} />
+            <mesh position={[0.03, -0.35, 0]}>
+              <sphereGeometry args={[0.038, 10, 10]} />
+              <meshStandardMaterial color="#ffe8dc" roughness={0.5} />
             </mesh>
-            <mesh position={[0.06, -0.41, 0.02]}>
-              <sphereGeometry args={[0.045, 10, 10]} />
-              <meshStandardMaterial color="#fff1e6" roughness={0.55} />
-            </mesh>
+
+            {/* Fallen Angel Queen Scepter */}
+            <group position={[0.04, -0.36, 0.06]} rotation={[0.45, 0, 0]}>
+              <mesh>
+                <cylinderGeometry args={[0.018, 0.014, 1.45, 10]} />
+                <meshStandardMaterial color="#3b0d18" roughness={0.35} metalness={0.4} />
+              </mesh>
+              {/* Ornate Gold Crown & Glowing Crimson Crystal Head */}
+              <mesh position={[0, 0.74, 0]}>
+                <torusGeometry args={[0.085, 0.018, 10, 24]} />
+                <meshStandardMaterial color="#d4af37" metalness={0.94} roughness={0.15} />
+              </mesh>
+              <mesh position={[0, 0.74, 0]}>
+                <octahedronGeometry args={[0.055, 0]} />
+                <meshStandardMaterial
+                  color="#fb7185"
+                  emissive="#f43f5e"
+                  emissiveIntensity={1.8}
+                  toneMapped={false}
+                />
+              </mesh>
+            </group>
           </group>
 
-          {/* Feathered White & Gold Celestial Wings */}
-          <group ref={leftWingRef} position={[-0.12, 0.34, -0.14]} scale={[-1.05, 1.05, 1]}>
+          {/* ===== LARGE ARCHED FALLEN ANGEL WINGS (OBSIDIAN OUTER + CRIMSON INNER) ===== */}
+          <group ref={leftWingRef} position={[-0.1, 0.34, -0.14]} scale={[-1.08, 1.08, 1]}>
             <mesh geometry={wingGeo}>
               <meshStandardMaterial
-                color="#fffbeb"
-                emissive="#fde68a"
-                emissiveIntensity={0.45}
-                roughness={0.25}
-                metalness={0.3}
+                color="#14090e"
+                roughness={0.42}
+                metalness={0.25}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+            <mesh geometry={wingGeo} position={[0.02, -0.04, 0.02]} scale={[0.88, 0.88, 1]}>
+              <meshStandardMaterial
+                color="#7f1428"
+                emissive="#4c0519"
+                emissiveIntensity={0.35}
+                roughness={0.48}
                 side={THREE.DoubleSide}
               />
             </mesh>
           </group>
-          <group ref={rightWingRef} position={[0.12, 0.34, -0.14]} scale={[1.05, 1.05, 1]}>
+
+          <group ref={rightWingRef} position={[0.1, 0.34, -0.14]} scale={[1.08, 1.08, 1]}>
             <mesh geometry={wingGeo}>
               <meshStandardMaterial
-                color="#fffbeb"
-                emissive="#fde68a"
-                emissiveIntensity={0.45}
-                roughness={0.25}
-                metalness={0.3}
+                color="#14090e"
+                roughness={0.42}
+                metalness={0.25}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+            <mesh geometry={wingGeo} position={[0.02, -0.04, 0.02]} scale={[0.88, 0.88, 1]}>
+              <meshStandardMaterial
+                color="#7f1428"
+                emissive="#4c0519"
+                emissiveIntensity={0.35}
+                roughness={0.48}
                 side={THREE.DoubleSide}
               />
             </mesh>
           </group>
 
-          {/* ===== HEAD, EYES, SILVER HAIR & CELESTIAL HALO ===== */}
-          <group ref={headGroupRef} position={[0, 0.64, 0]}>
+          {/* ===== HEAD, CRIMSON HAIR & SLEEK OBSIDIAN HORNS ===== */}
+          <group ref={headGroupRef} position={[0, 0.62, 0]}>
             <mesh castShadow>
-              <sphereGeometry args={[0.195, 24, 24]} />
-              <meshStandardMaterial color="#fff1e6" roughness={0.52} />
+              <sphereGeometry args={[0.185, 24, 24]} />
+              <meshStandardMaterial color="#ffe8dc" roughness={0.5} />
             </mesh>
 
-            {/* Expressive Anime Eyes */}
-            <mesh ref={leftEyeRef} position={[-0.068, 0.01, 0.178]}>
-              <sphereGeometry args={[0.025, 12, 12]} />
-              <meshStandardMaterial color="#3b1d22" emissive="#d4af37" emissiveIntensity={0.35} />
+            {/* Luminous Anime Eyes */}
+            <mesh ref={leftEyeRef} position={[-0.065, 0.01, 0.168]}>
+              <sphereGeometry args={[0.024, 12, 12]} />
+              <meshStandardMaterial color="#2a0a18" emissive="#e11d48" emissiveIntensity={0.55} />
             </mesh>
-            <mesh ref={rightEyeRef} position={[0.068, 0.01, 0.178]}>
-              <sphereGeometry args={[0.025, 12, 12]} />
-              <meshStandardMaterial color="#3b1d22" emissive="#d4af37" emissiveIntensity={0.35} />
-            </mesh>
-
-            {/* Silver Hair Crown & Side Locks */}
-            <mesh position={[0, 0.05, -0.02]}>
-              <sphereGeometry args={[0.212, 22, 22]} />
-              <meshStandardMaterial color="#e2e8f0" roughness={0.3} metalness={0.2} />
-            </mesh>
-            <mesh position={[-0.16, -0.14, 0.07]} rotation={[0, 0, 0.08]}>
-              <cylinderGeometry args={[0.04, 0.018, 0.34, 10]} />
-              <meshStandardMaterial color="#e2e8f0" roughness={0.3} />
-            </mesh>
-            <mesh position={[0.16, -0.14, 0.07]} rotation={[0, 0, -0.08]}>
-              <cylinderGeometry args={[0.04, 0.018, 0.34, 10]} />
-              <meshStandardMaterial color="#e2e8f0" roughness={0.3} />
+            <mesh ref={rightEyeRef} position={[0.065, 0.01, 0.168]}>
+              <sphereGeometry args={[0.024, 12, 12]} />
+              <meshStandardMaterial color="#2a0a18" emissive="#e11d48" emissiveIntensity={0.55} />
             </mesh>
 
-            {/* Long Flowing Silver Back Hair */}
+            {/* Crimson-Magenta Hair Crown & Side Locks */}
+            <mesh position={[0, 0.045, -0.02]}>
+              <sphereGeometry args={[0.205, 22, 22]} />
+              <meshStandardMaterial color="#9f1239" roughness={0.34} metalness={0.18} />
+            </mesh>
+            <mesh position={[-0.155, -0.14, 0.06]} rotation={[0, 0, 0.08]}>
+              <cylinderGeometry args={[0.038, 0.016, 0.36, 10]} />
+              <meshStandardMaterial color="#9f1239" roughness={0.34} />
+            </mesh>
+            <mesh position={[0.155, -0.14, 0.06]} rotation={[0, 0, -0.08]}>
+              <cylinderGeometry args={[0.038, 0.016, 0.36, 10]} />
+              <meshStandardMaterial color="#9f1239" roughness={0.34} />
+            </mesh>
+
+            {/* Long Flowing Crimson Back Hair */}
             <group ref={backHairRef} position={[0, 0.04, -0.16]}>
-              <mesh position={[0, -0.36, -0.04]}>
-                <coneGeometry args={[0.23, 0.88, 16]} />
-                <meshStandardMaterial color="#cbd5e1" roughness={0.32} metalness={0.18} />
+              <mesh position={[0, -0.42, -0.04]}>
+                <coneGeometry args={[0.25, 1.02, 16]} />
+                <meshStandardMaterial color="#881337" roughness={0.36} metalness={0.16} />
               </mesh>
             </group>
 
-            {/* Sakura & Gold Ornament */}
-            <mesh position={[-0.16, 0.12, 0.1]}>
-              <dodecahedronGeometry args={[0.05, 0]} />
-              <meshStandardMaterial color="#f9a8d4" emissive="#db2777" emissiveIntensity={0.35} />
+            {/* Sleek Obsidian Horns */}
+            <mesh position={[-0.085, 0.23, 0.02]} rotation={[0.15, 0, 0.22]}>
+              <coneGeometry args={[0.034, 0.22, 10]} />
+              <meshStandardMaterial color="#12090e" roughness={0.22} metalness={0.55} />
+            </mesh>
+            <mesh position={[0.085, 0.23, 0.02]} rotation={[0.15, 0, -0.22]}>
+              <coneGeometry args={[0.034, 0.22, 10]} />
+              <meshStandardMaterial color="#12090e" roughness={0.22} metalness={0.55} />
             </mesh>
 
-            {/* Golden Celestial Halo */}
-            <mesh position={[0, 0.32, -0.04]} rotation={[Math.PI * 0.42, 0, 0]}>
-              <torusGeometry args={[0.25, 0.014, 12, 48]} />
+            {/* Subtle Golden Royal Circlet Halo */}
+            <mesh position={[0, 0.34, -0.04]} rotation={[Math.PI * 0.42, 0, 0]}>
+              <torusGeometry args={[0.24, 0.012, 12, 48]} />
               <meshStandardMaterial
                 color="#fde68a"
                 emissive="#f59e0b"
-                emissiveIntensity={1.5}
+                emissiveIntensity={1.4}
                 metalness={0.92}
                 roughness={0.15}
                 toneMapped={false}
@@ -315,16 +404,19 @@ export const Angel3D: React.FC<Angel3DProps> = ({
           </group>
         </group>
 
-        {/* Golden Magical Particles Orbiting Angel */}
+        {/* Golden & Crimson Spirit Particles Orbiting Fallen Angel Queen */}
         <group ref={auraRef} position={[0, 0.9, 0]}>
           {Array.from({ length: 10 }).map((_, i) => {
             const ang = (i / 10) * Math.PI * 2;
-            const r = 0.58 + (i % 3) * 0.12;
-            const y = ((i % 5) - 2) * 0.25;
+            const r = 0.62 + (i % 3) * 0.14;
+            const y = ((i % 5) - 2) * 0.26;
             return (
               <mesh key={i} position={[Math.cos(ang) * r, y, Math.sin(ang) * r]}>
                 <octahedronGeometry args={[0.022, 0]} />
-                <meshBasicMaterial color="#fde68a" toneMapped={false} />
+                <meshBasicMaterial
+                  color={i % 2 === 0 ? '#fde68a' : '#fb7185'}
+                  toneMapped={false}
+                />
               </mesh>
             );
           })}
