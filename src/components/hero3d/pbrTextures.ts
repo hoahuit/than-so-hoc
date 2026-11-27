@@ -24,25 +24,45 @@ function makeCanvas(w: number, h: number): [HTMLCanvasElement, CanvasRenderingCo
   return [canvas, ctx];
 }
 
+export function createSakuraPetalGeometry(): THREE.BufferGeometry {
+  const petalShape = new THREE.Shape();
+  petalShape.moveTo(0, 0);
+  petalShape.bezierCurveTo(0.42, 0.28, 0.48, 0.95, 0.14, 1.28);
+  petalShape.lineTo(0, 1.12);
+  petalShape.lineTo(-0.14, 1.28);
+  petalShape.bezierCurveTo(-0.48, 0.95, -0.42, 0.28, 0, 0);
+
+  const petalGeometry = new THREE.ShapeGeometry(petalShape, 6);
+  const posAttr = petalGeometry.getAttribute('position');
+  for (let i = 0; i < posAttr.count; i++) {
+    const x = posAttr.getX(i);
+    const y = posAttr.getY(i);
+    const z = Math.sin((y / 1.28) * Math.PI) * 0.12 - Math.abs(x) * 0.15;
+    posAttr.setZ(i, z);
+  }
+  petalGeometry.computeVertexNormals();
+  return petalGeometry;
+}
+
 export function createProceduralPBRTextures(): PBRTextureSet {
-  // 1. Deep Burgundy Lacquered Wood Grain (Diffuse + Roughness)
-  const [woodCanvas, wCtx] = makeCanvas(512, 512);
-  const [woodRoughCanvas, wrCtx] = makeCanvas(512, 512);
+  // 1. Deep Burgundy Lacquered Wood Grain (256x256 for fast GPU upload)
+  const [woodCanvas, wCtx] = makeCanvas(256, 256);
+  const [woodRoughCanvas, wrCtx] = makeCanvas(256, 256);
 
   wCtx.fillStyle = '#4a0e14';
-  wCtx.fillRect(0, 0, 512, 512);
+  wCtx.fillRect(0, 0, 256, 256);
   wrCtx.fillStyle = '#555555';
-  wrCtx.fillRect(0, 0, 512, 512);
+  wrCtx.fillRect(0, 0, 256, 256);
 
-  for (let i = 0; i < 180; i++) {
-    const x = (i / 180) * 512;
+  for (let i = 0; i < 96; i++) {
+    const x = (i / 96) * 256;
     const alpha = 0.04 + (i % 7) * 0.015;
     wCtx.fillStyle = i % 2 === 0 ? `rgba(20, 4, 6, ${alpha})` : `rgba(120, 28, 36, ${alpha})`;
-    wCtx.fillRect(x, 0, 2 + (i % 3), 512);
+    wCtx.fillRect(x, 0, 2, 256);
 
     const rVal = 65 + (i % 9) * 10;
     wrCtx.fillStyle = `rgb(${rVal},${rVal},${rVal})`;
-    wrCtx.fillRect(x, 0, 2 + (i % 3), 512);
+    wrCtx.fillRect(x, 0, 2, 256);
   }
 
   const woodMap = new THREE.CanvasTexture(woodCanvas);
@@ -52,19 +72,19 @@ export function createProceduralPBRTextures(): PBRTextureSet {
   const woodRoughness = new THREE.CanvasTexture(woodRoughCanvas);
   woodRoughness.wrapS = woodRoughness.wrapT = THREE.RepeatWrapping;
 
-  // 2. Obsidian Carved Stone (Diffuse + Roughness)
-  const [stoneCanvas, sCtx] = makeCanvas(512, 512);
-  const [stoneRoughCanvas, srCtx] = makeCanvas(512, 512);
+  // 2. Obsidian Carved Stone (256x256)
+  const [stoneCanvas, sCtx] = makeCanvas(256, 256);
+  const [stoneRoughCanvas, srCtx] = makeCanvas(256, 256);
 
   sCtx.fillStyle = '#141016';
-  sCtx.fillRect(0, 0, 512, 512);
+  sCtx.fillRect(0, 0, 256, 256);
   srCtx.fillStyle = '#888888';
-  srCtx.fillRect(0, 0, 512, 512);
+  srCtx.fillRect(0, 0, 256, 256);
 
-  for (let i = 0; i < 1200; i++) {
-    const x = (i * 73) % 512;
-    const y = (i * 137) % 512;
-    const size = 1 + (i % 4);
+  for (let i = 0; i < 450; i++) {
+    const x = (i * 73) % 256;
+    const y = (i * 137) % 256;
+    const size = 1 + (i % 3);
     const shade = 14 + (i % 22);
     sCtx.fillStyle = `rgb(${shade}, ${shade - 2}, ${shade + 4})`;
     sCtx.fillRect(x, y, size, size);
@@ -138,24 +158,8 @@ export function createProceduralPBRTextures(): PBRTextureSet {
   const scrollMap = new THREE.CanvasTexture(scrollCanvas);
   scrollMap.colorSpace = THREE.SRGBColorSpace;
 
-  // 5. Realistic Curved Sakura Petal Geometry (teardrop/notched petal shape)
-  const petalShape = new THREE.Shape();
-  petalShape.moveTo(0, 0);
-  petalShape.bezierCurveTo(0.42, 0.28, 0.48, 0.95, 0.14, 1.28);
-  petalShape.lineTo(0, 1.12); // classic sakura notch
-  petalShape.lineTo(-0.14, 1.28);
-  petalShape.bezierCurveTo(-0.48, 0.95, -0.42, 0.28, 0, 0);
-
-  const petalGeometry = new THREE.ShapeGeometry(petalShape, 8);
-  // Add gentle 3D cup curvature to the petal
-  const posAttr = petalGeometry.getAttribute('position');
-  for (let i = 0; i < posAttr.count; i++) {
-    const x = posAttr.getX(i);
-    const y = posAttr.getY(i);
-    const z = Math.sin((y / 1.28) * Math.PI) * 0.12 - Math.abs(x) * 0.15;
-    posAttr.setZ(i, z);
-  }
-  petalGeometry.computeVertexNormals();
+  // 5. Realistic Curved Sakura Petal Geometry
+  const petalGeometry = createSakuraPetalGeometry();
 
   return {
     woodMap,

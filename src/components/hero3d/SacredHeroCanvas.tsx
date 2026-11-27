@@ -7,7 +7,7 @@ import gsap from 'gsap';
 import { ShrineEnvironment3D } from './ShrineEnvironment3D';
 import { Angel3D, type AngelPoseMode } from './Angel3D';
 import { ShrineAltar3D, type DrawPhase3D } from './ShrineAltar3D';
-import { createProceduralPBRTextures, disposePBRTextures } from './pbrTextures';
+import { createSakuraPetalGeometry } from './pbrTextures';
 
 export type CeremonyPhase =
   | 'arrival'
@@ -18,11 +18,29 @@ export type CeremonyPhase =
   | 'present'
   | 'complete';
 
+type DeviceTier = 'high' | 'medium' | 'low';
+
+function detectDeviceTier(): { tier: DeviceTier; isMobile: boolean } {
+  if (typeof window === 'undefined') return { tier: 'high', isMobile: false };
+  const isMobile = window.innerWidth < 768;
+  const cores = navigator.hardwareConcurrency || 4;
+  const mem = (navigator as unknown as { deviceMemory?: number }).deviceMemory || 8;
+
+  if (isMobile || cores <= 4 || mem <= 4) {
+    return { tier: isMobile ? 'low' : 'medium', isMobile };
+  }
+  if (cores >= 6 && mem >= 8) {
+    return { tier: 'high', isMobile: false };
+  }
+  return { tier: 'medium', isMobile: false };
+}
+
 interface SacredHeroCanvasProps {
   drawPhase: DrawPhase3D;
   skipRequested: boolean;
   onAltarClick: () => void;
   onPhaseChange?: (phase: CeremonyPhase) => void;
+  onSceneReady?: () => void;
 }
 
 class WebGLErrorBoundary extends Component<
@@ -83,6 +101,7 @@ function createSakuraSeeds(count: number): SakuraPetalSeed[] {
 
 interface DirectorProps {
   isMobile: boolean;
+  tier: DeviceTier;
   drawPhase: DrawPhase3D;
   skipRequested: boolean;
   onAltarClick: () => void;
@@ -91,6 +110,7 @@ interface DirectorProps {
 
 const CinematicSceneDirector: React.FC<DirectorProps> = ({
   isMobile,
+  tier,
   drawPhase,
   skipRequested,
   onAltarClick,
@@ -136,15 +156,15 @@ const CinematicSceneDirector: React.FC<DirectorProps> = ({
   const prevPosVec = useMemo(() => new THREE.Vector3(), []);
   const nextPosVec = useMemo(() => new THREE.Vector3(), []);
 
-  const petalCount = isMobile ? 18 : 42;
+  const petalCount = tier === 'low' ? 16 : tier === 'medium' ? 26 : 42;
   const sakuraSeeds = useMemo(() => createSakuraSeeds(petalCount), [petalCount]);
 
-  const petalAssets = useMemo(() => createProceduralPBRTextures(), []);
+  const petalGeometry = useMemo(() => createSakuraPetalGeometry(), []);
   useEffect(() => {
     return () => {
-      disposePBRTextures(petalAssets);
+      petalGeometry.dispose();
     };
-  }, [petalAssets]);
+  }, [petalGeometry]);
 
   // Allow user to skip intro immediately
   useEffect(() => {
@@ -546,7 +566,7 @@ const CinematicSceneDirector: React.FC<DirectorProps> = ({
       />
 
       <ShrineEnvironment3D
-        isMobile={isMobile}
+        highQuality={tier === 'high'}
         lanternLightsRef={lanternLightsRef}
         backdropMatRef={backdropMatRef}
         waterRippleRef={waterRippleRef}
@@ -582,7 +602,7 @@ const CinematicSceneDirector: React.FC<DirectorProps> = ({
 
       <instancedMesh
         ref={sakuraMeshRef}
-        args={[petalAssets.petalGeometry, undefined, petalCount]}
+        args={[petalGeometry, undefined, petalCount]}
       >
         <meshStandardMaterial
           color="#fbcfe8"
@@ -603,34 +623,56 @@ export const SacredHeroCanvas: React.FC<SacredHeroCanvasProps> = ({
   skipRequested,
   onAltarClick,
   onPhaseChange,
+  onSceneReady,
 }) => {
-  const [isMobile, setIsMobile] = useState<boolean>(() =>
-    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  const [{ tier, isMobile }, setDeviceInfo] = useState<{ tier: DeviceTier; isMobile: boolean }>(
+    () => detectDeviceTier()
   );
+  const [isPageHidden, setIsPageHidden] = useState<boolean>(false);
 
   useEffect(() => {
-    const onResize = () => setIsMobile(window.innerWidth < 768);
+    const onResize = () => setDeviceInfo(detectDeviceTier());
+    const onVisibilityChange = () => {
+      const hidden = document.hidden;
+      setIsPageHidden(hidden);
+      if (hidden) {
+        gsap.globalTimeline.pause();
+      } else {
+        gsap.globalTimeline.resume();
+      }
+    };
     window.addEventListener('resize', onResize, { passive: true });
-    return () => window.removeEventListener('resize', onResize);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      window.removeEventListener('resize', onResize);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
   }, []);
+
+  const dprRange: [number, number] =
+    tier === 'low' ? [1, 1.15] : tier === 'medium' ? [1, 1.25] : [1, 1.5];
 
   return (
     <WebGLErrorBoundary>
       <div className="absolute inset-0 h-full w-full">
         <Canvas
-          shadows={!isMobile}
+          frameloop={isPageHidden ? 'never' : 'always'}
+          shadows={tier === 'high'}
           camera={{ position: [0, 0.35, 4.3], fov: isMobile ? 48 : 42 }}
-          dpr={isMobile ? [1, 1.35] : [1, 1.75]}
+          dpr={dprRange}
           gl={{
-            antialias: true,
+            antialias: tier !== 'low',
             powerPreference: 'high-performance',
             toneMapping: THREE.ACESFilmicToneMapping,
             toneMappingExposure: 1.05,
           }}
+          onCreated={() => {
+            onSceneReady?.();
+          }}
         >
           <color attach="background" args={['#0d0307']} />
 
-          <Environment resolution={128}>
+          <Environment resolution={64}>
             <group rotation={[-Math.PI / 3, 0, 0]}>
               <Lightformer
                 form="ring"
@@ -658,6 +700,7 @@ export const SacredHeroCanvas: React.FC<SacredHeroCanvasProps> = ({
 
           <CinematicSceneDirector
             isMobile={isMobile}
+            tier={tier}
             drawPhase={drawPhase}
             skipRequested={skipRequested}
             onAltarClick={onAltarClick}
@@ -676,7 +719,7 @@ export const SacredHeroCanvas: React.FC<SacredHeroCanvasProps> = ({
             maxAzimuthAngle={Math.PI * 0.16}
           />
 
-          {!isMobile && (
+          {tier === 'high' && (
             <EffectComposer multisampling={0}>
               <Bloom
                 mipmapBlur

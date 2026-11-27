@@ -1,20 +1,30 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { Suspense, lazy, useState, useEffect, useCallback, useRef } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { PetalsCanvas } from './components/PetalsCanvas';
 import { Header } from './components/Header';
 import { MarqueeBanner } from './components/MarqueeBanner';
 import { HeroOmikujiSection } from './components/HeroOmikujiSection';
 import { PlansCarousel } from './components/PlansCarousel';
-import { OmikujiShakeModal } from './components/OmikujiShakeModal';
-import { TarotOmikujiDeck } from './components/TarotOmikujiDeck';
 import { FortuneCardDisplay } from './components/FortuneCardDisplay';
 import { DailyFortune } from './components/DailyFortune';
-import { NumerologyCalculatorModal } from './components/NumerologyCalculatorModal';
-import { SavedFortunesDrawer, type SavedFortuneEntry } from './components/SavedFortunesDrawer';
+import { type SavedFortuneEntry } from './components/SavedFortunesDrawer';
 import { FloatingBottomNav } from './components/FloatingBottomNav';
 import { SealedFortuneIntro } from './components/SealedFortuneIntro';
 import { OMIKUJI_DATABASE, getRandomFortune, type OmikujiFortune, type PlanType } from './data/omikujiData';
 import { shrineAudio } from './utils/sound';
+
+const OmikujiShakeModal = lazy(() =>
+  import('./components/OmikujiShakeModal').then((m) => ({ default: m.OmikujiShakeModal }))
+);
+const TarotOmikujiDeck = lazy(() =>
+  import('./components/TarotOmikujiDeck').then((m) => ({ default: m.TarotOmikujiDeck }))
+);
+const NumerologyCalculatorModal = lazy(() =>
+  import('./components/NumerologyCalculatorModal').then((m) => ({ default: m.NumerologyCalculatorModal }))
+);
+const SavedFortunesDrawer = lazy(() =>
+  import('./components/SavedFortunesDrawer').then((m) => ({ default: m.SavedFortunesDrawer }))
+);
 
 const STORAGE_KEY = 'kami_no_su_saved_fortunes_v1';
 
@@ -27,7 +37,6 @@ export function App() {
   const [isNumerologyOpen, setIsNumerologyOpen] = useState<boolean>(false);
   const [isSavedOpen, setIsSavedOpen] = useState<boolean>(false);
   const [showSealedIntro, setShowSealedIntro] = useState<boolean>(false);
-  const [introComplete, setIntroComplete] = useState<boolean>(false);
   const [activeMobileTab, setActiveMobileTab] = useState<'home' | 'plans' | 'numerology' | 'saved'>('home');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -188,26 +197,23 @@ export function App() {
       {/* Subtle Floating Petals Canvas */}
       <PetalsCanvas />
 
-      {/* Transparent-to-Solid Header (Revealed after Phase 5 Cinematic Intro) */}
-      {introComplete && (
-        <Header
-          onOpenNumerology={() => setIsNumerologyOpen(true)}
-          onOpenSaved={() => setIsSavedOpen(true)}
-          onScrollToOmikuji={() => scrollToElement('hero-omikuji-section')}
-          onOpenTarotDraw={() => scrollToElement('tarot-section')}
-          savedCount={savedFortunes.length}
-          musicOn={musicOn}
-          onToggleMusic={handleToggleMusic}
-        />
-      )}
+      {/* Transparent-to-Solid Header (Stage A Instant Shell) */}
+      <Header
+        onOpenNumerology={() => setIsNumerologyOpen(true)}
+        onOpenSaved={() => setIsSavedOpen(true)}
+        onScrollToOmikuji={() => scrollToElement('hero-omikuji-section')}
+        onOpenTarotDraw={() => scrollToElement('tarot-section')}
+        savedCount={savedFortunes.length}
+        musicOn={musicOn}
+        onToggleMusic={handleToggleMusic}
+      />
 
-      {/* ================= 1. HERO SECTION: FULL-SCREEN ANGEL INTRO -> HERO ================= */}
+      {/* ================= 1. HERO SECTION: PROGRESSIVE 3D SHRINE ================= */}
       <div id="hero-omikuji-section">
         <HeroOmikujiSection
           selectedPlan={selectedPlan}
           onSelectPlan={setSelectedPlan}
           onFortuneDrawn={handleFortuneDrawn}
-          onIntroComplete={() => setIntroComplete(true)}
         />
       </div>
 
@@ -246,15 +252,17 @@ export function App() {
           </div>
         </div>
 
-        {/* Trải Bài Tarot Omikuji (Lựa chọn bổ trợ thú vị) */}
+        {/* Trải Bài Tarot Omikuji (Lazy-loaded) */}
         <div id="tarot-section">
-          <TarotOmikujiDeck
-            selectedPlan={selectedPlan}
-            onCardPicked={(fortune) => {
-              handleFortuneDrawn(fortune);
-              scrollToElement('fortune-result-section');
-            }}
-          />
+          <Suspense fallback={null}>
+            <TarotOmikujiDeck
+              selectedPlan={selectedPlan}
+              onCardPicked={(fortune) => {
+                handleFortuneDrawn(fortune);
+                scrollToElement('fortune-result-section');
+              }}
+            />
+          </Suspense>
         </div>
       </main>
 
@@ -271,9 +279,8 @@ export function App() {
         </div>
       </footer>
 
-      {/* Mobile Floating Bottom Bar (Revealed after Phase 5 Cinematic Intro) */}
-      {introComplete && (
-        <FloatingBottomNav
+      {/* Mobile Floating Bottom Bar (Stage A Instant Shell) */}
+      <FloatingBottomNav
         activeTab={activeMobileTab}
         onHome={() => {
           setActiveMobileTab('home');
@@ -294,39 +301,38 @@ export function App() {
           setActiveMobileTab('saved');
           setIsSavedOpen(true);
         }}
-          savedCount={savedFortunes.length}
+        savedCount={savedFortunes.length}
+      />
+
+      {/* Lazy-Loaded Modals & Drawers */}
+      <Suspense fallback={null}>
+        <OmikujiShakeModal
+          isOpen={isShakeModalOpen}
+          selectedPlan={selectedPlan}
+          isFortuneSaved={isFortuneSaved}
+          onClose={() => setIsShakeModalOpen(false)}
+          onFortuneRevealed={handleFortuneDrawn}
+          onSaveFortune={handleSaveFortune}
+          onShareFortune={handleShareFortune}
         />
-      )}
 
-      {/* Full-Screen Omikuji Shake Ritual Modal */}
-      <OmikujiShakeModal
-        isOpen={isShakeModalOpen}
-        selectedPlan={selectedPlan}
-        isFortuneSaved={isFortuneSaved}
-        onClose={() => setIsShakeModalOpen(false)}
-        onFortuneRevealed={handleFortuneDrawn}
-        onSaveFortune={handleSaveFortune}
-        onShareFortune={handleShareFortune}
-      />
+        <NumerologyCalculatorModal
+          isOpen={isNumerologyOpen}
+          onClose={() => setIsNumerologyOpen(false)}
+        />
 
-      {/* Numerology Modal */}
-      <NumerologyCalculatorModal
-        isOpen={isNumerologyOpen}
-        onClose={() => setIsNumerologyOpen(false)}
-      />
-
-      {/* Saved Fortunes Drawer */}
-      <SavedFortunesDrawer
-        isOpen={isSavedOpen}
-        onClose={() => setIsSavedOpen(false)}
-        entries={savedFortunes}
-        onRemove={handleRemoveSaved}
-        onSelectFortune={(fortune) => {
-          setCurrentFortune(fortune);
-          setFlipVersion((prev) => prev + 1);
-          scrollToElement('fortune-result-section');
-        }}
-      />
+        <SavedFortunesDrawer
+          isOpen={isSavedOpen}
+          onClose={() => setIsSavedOpen(false)}
+          entries={savedFortunes}
+          onRemove={handleRemoveSaved}
+          onSelectFortune={(fortune) => {
+            setCurrentFortune(fortune);
+            setFlipVersion((prev) => prev + 1);
+            scrollToElement('fortune-result-section');
+          }}
+        />
+      </Suspense>
 
       {/* Toast Notification */}
       {toastMessage && (

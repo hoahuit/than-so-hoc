@@ -4,24 +4,21 @@ import { MeshReflectorMaterial, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface ShrineEnvironment3DProps {
-  isMobile: boolean;
+  highQuality: boolean;
   lanternLightsRef: React.MutableRefObject<(THREE.PointLight | null)[]>;
   backdropMatRef: React.MutableRefObject<THREE.MeshBasicMaterial | null>;
   waterRippleRef: React.MutableRefObject<THREE.Mesh | null>;
   waterRippleMatRef: React.MutableRefObject<THREE.MeshBasicMaterial | null>;
 }
 
+// Reduced from 6 to 2 strategic point lights for 3x faster PBR shader performance
 const LANTERN_LIGHT_POSITIONS: [number, number, number][] = [
-  [-2.8, -0.8, -1.6],
-  [2.8, -0.8, -1.6],
-  [-3.2, -0.4, -4.2],
-  [3.2, -0.4, -4.2],
-  [-1.8, 0.4, -6.5],
-  [1.8, 0.4, -6.5],
+  [-2.8, -0.6, -1.8],
+  [2.8, -0.6, -1.8],
 ];
 
 export const ShrineEnvironment3D: React.FC<ShrineEnvironment3DProps> = ({
-  isMobile,
+  highQuality,
   lanternLightsRef,
   backdropMatRef,
   waterRippleRef,
@@ -93,7 +90,7 @@ export const ShrineEnvironment3D: React.FC<ShrineEnvironment3DProps> = ({
       {/* ===== FOREGROUND REFLECTIVE SHRINE WATER SURFACE ===== */}
       <mesh position={[0, -1.94, 0.5]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[28, 18]} />
-        {isMobile ? (
+        {!highQuality ? (
           <meshStandardMaterial
             color="#0f050a"
             roughness={0.14}
@@ -101,17 +98,17 @@ export const ShrineEnvironment3D: React.FC<ShrineEnvironment3DProps> = ({
           />
         ) : (
           <MeshReflectorMaterial
-            blur={[300, 90]}
-            resolution={512}
+            blur={[180, 60]}
+            resolution={256}
             mixBlur={0.85}
-            mixStrength={36}
+            mixStrength={34}
             roughness={0.2}
             depthScale={1.1}
             minDepthThreshold={0.4}
             maxDepthThreshold={1.4}
             color="#10050a"
             metalness={0.78}
-            mirror={0.6}
+            mirror={0.55}
           />
         )}
       </mesh>
