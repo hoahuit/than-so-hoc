@@ -47,9 +47,9 @@ export const ShrineEnvironment3D: React.FC<ShrineEnvironment3DProps> = ({
       {/* Atmospheric Depth Fog */}
       <fogExp2 attach="fog" args={['#100308', 0.022]} />
 
-      {/* ===== AAA CINEMATIC SHRINE BACKDROP (MOON, MOUNTAINS, TORII, SAKURA TREES) ===== */}
-      <mesh position={[0, 1.85, -10.5]}>
-        <planeGeometry args={[26.5, 14.9]} />
+      {/* ===== AAA CINEMATIC SHRINE BACKDROP (FULL-SCREEN COVERAGE) ===== */}
+      <mesh position={[0, 1.4, -10.5]}>
+        <planeGeometry args={[34, 19.2]} />
         <meshBasicMaterial
           ref={backdropMatRef}
           map={backdropTexture}
