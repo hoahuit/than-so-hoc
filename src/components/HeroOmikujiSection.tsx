@@ -137,8 +137,9 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
       <div className="relative h-[46vh] min-h-[290px] max-h-[410px] w-full shrink-0 overflow-hidden md:absolute md:inset-0 md:h-full md:max-h-none">
         {/* STAGE A: INSTANT STATIC HERO SHELL (Zero Three.js dependency, immediate LCP) */}
         <div
-          className={`absolute inset-0 transition-opacity duration-700 ${sceneReady ? 'opacity-0 pointer-events-none' : 'opacity-100'
-            }`}
+          className={`absolute inset-0 transition-opacity duration-700 ${
+            sceneReady ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          }`}
         >
           <img
             src="/images/shrine-backdrop-aaa.jpg"
@@ -157,8 +158,9 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
 
         {/* STAGE B & C: LAZY-LOADED PROGRESSIVE 3D SCENE */}
         <div
-          className={`absolute inset-0 transition-opacity duration-700 ${sceneReady ? 'opacity-100' : 'opacity-0'
-            }`}
+          className={`absolute inset-0 transition-opacity duration-700 ${
+            sceneReady ? 'opacity-100' : 'opacity-0'
+          }`}
         >
           <Suspense fallback={null}>
             <SacredHeroCanvas
@@ -212,10 +214,11 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
                     shrineAudio.playShrineBell();
                     onSelectPlan(tab.id);
                   }}
-                  className={`rounded-full px-3 py-1 text-[11px] sm:px-3.5 sm:text-xs font-semibold backdrop-blur-md transition-all duration-200 ${isSelected
+                  className={`rounded-full px-3 py-1 text-[11px] sm:px-3.5 sm:text-xs font-semibold backdrop-blur-md transition-all duration-200 ${
+                    isSelected
                       ? 'border border-brass-400 bg-temple-900/85 text-amber-100 shadow-gold-glow'
                       : 'border border-white/20 bg-black/45 text-white/80 hover:border-brass-300/60 hover:text-white'
-                    }`}
+                  }`}
                 >
                   {tab.label}
                 </button>
