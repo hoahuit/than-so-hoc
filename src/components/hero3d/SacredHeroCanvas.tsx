@@ -206,8 +206,8 @@ const CinematicSceneDirector: React.FC<DirectorProps> = ({
       ? { x: 0, y: -0.82, z: 0.35 }
       : { x: 0.32, y: -1.48, z: 0.35 };
     const finalCamPos = isMobile
-      ? { x: 0, y: 0.25, z: 5.5 }
-      : { x: -0.25, y: 0.25, z: 5.8 };
+      ? { x: 0, y: 0.28, z: 5.9 }
+      : { x: -0.25, y: 0.28, z: 6.15 };
     const angelRestPos = isMobile
       ? { x: -1.05, y: -0.68, z: 0.05 }
       : { x: -1.55, y: -1.25, z: 0.05 };

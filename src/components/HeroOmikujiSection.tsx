@@ -117,7 +117,7 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
   return (
     <section
       id="hero-omikuji-section"
-      className="relative h-screen min-h-[600px] w-full overflow-hidden bg-[#0d0307]"
+      className="relative h-[70vh] min-h-[440px] max-h-[720px] w-full overflow-hidden bg-[#0d0307]"
     >
       {/* ================= FULL-SCREEN 3D & BACKDROP STAGE ================= */}
       <div className="absolute inset-0 h-full w-full overflow-hidden">
@@ -185,7 +185,7 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
       </div>
 
       {/* ================= MINIMAL TITLE ONLY: LINH XĂM KHAI VẬN ================= */}
-      <div className="pointer-events-none relative z-20 flex h-full w-full flex-col items-center justify-end pb-24 md:items-start md:justify-end md:px-12 md:pb-14 lg:px-16">
+      <div className="pointer-events-none relative z-20 flex h-full w-full flex-col items-center justify-end pb-6 md:items-start md:justify-end md:px-12 md:pb-8 lg:px-16">
         <div className="space-y-3 text-center md:text-left">
           <h1 className="font-serif text-3xl font-black tracking-tight leading-none text-transparent bg-clip-text bg-gradient-to-r from-[#fff8e7] via-[#fde7b0] to-[#d4af37] drop-shadow-[0_4px_22px_rgba(0,0,0,0.95)] sm:text-5xl lg:text-6xl">
             Linh Xăm Khai Vận
