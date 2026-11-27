@@ -27,6 +27,7 @@ export function App() {
   const [isNumerologyOpen, setIsNumerologyOpen] = useState<boolean>(false);
   const [isSavedOpen, setIsSavedOpen] = useState<boolean>(false);
   const [showSealedIntro, setShowSealedIntro] = useState<boolean>(false);
+  const [introComplete, setIntroComplete] = useState<boolean>(false);
   const [activeMobileTab, setActiveMobileTab] = useState<'home' | 'plans' | 'numerology' | 'saved'>('home');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -187,23 +188,26 @@ export function App() {
       {/* Subtle Floating Petals Canvas */}
       <PetalsCanvas />
 
-      {/* Transparent-to-Solid Header */}
-      <Header
-        onOpenNumerology={() => setIsNumerologyOpen(true)}
-        onOpenSaved={() => setIsSavedOpen(true)}
-        onScrollToOmikuji={() => scrollToElement('hero-omikuji-section')}
-        onOpenTarotDraw={() => scrollToElement('tarot-section')}
-        savedCount={savedFortunes.length}
-        musicOn={musicOn}
-        onToggleMusic={handleToggleMusic}
-      />
+      {/* Transparent-to-Solid Header (Revealed after Phase 5 Cinematic Intro) */}
+      {introComplete && (
+        <Header
+          onOpenNumerology={() => setIsNumerologyOpen(true)}
+          onOpenSaved={() => setIsSavedOpen(true)}
+          onScrollToOmikuji={() => scrollToElement('hero-omikuji-section')}
+          onOpenTarotDraw={() => scrollToElement('tarot-section')}
+          savedCount={savedFortunes.length}
+          musicOn={musicOn}
+          onToggleMusic={handleToggleMusic}
+        />
+      )}
 
-      {/* ================= 1. HERO SECTION: DIVINE FORTUNE CORE 3D ================= */}
+      {/* ================= 1. HERO SECTION: FULL-SCREEN ANGEL INTRO -> HERO ================= */}
       <div id="hero-omikuji-section">
         <HeroOmikujiSection
           selectedPlan={selectedPlan}
           onSelectPlan={setSelectedPlan}
           onFortuneDrawn={handleFortuneDrawn}
+          onIntroComplete={() => setIntroComplete(true)}
         />
       </div>
 
@@ -267,8 +271,9 @@ export function App() {
         </div>
       </footer>
 
-      {/* Mobile Floating Bottom Bar */}
-      <FloatingBottomNav
+      {/* Mobile Floating Bottom Bar (Revealed after Phase 5 Cinematic Intro) */}
+      {introComplete && (
+        <FloatingBottomNav
         activeTab={activeMobileTab}
         onHome={() => {
           setActiveMobileTab('home');
@@ -289,8 +294,9 @@ export function App() {
           setActiveMobileTab('saved');
           setIsSavedOpen(true);
         }}
-        savedCount={savedFortunes.length}
-      />
+          savedCount={savedFortunes.length}
+        />
+      )}
 
       {/* Full-Screen Omikuji Shake Ritual Modal */}
       <OmikujiShakeModal
