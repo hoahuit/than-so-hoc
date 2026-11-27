@@ -15,6 +15,8 @@ interface ShrineAltar3DProps {
   ringMatsRef: React.MutableRefObject<(THREE.MeshStandardMaterial | null)[]>;
   symbolMatsRef: React.MutableRefObject<(THREE.MeshStandardMaterial | null)[]>;
   boxGroupRef: React.RefObject<THREE.Group | null>;
+  lidGroupRef: React.RefObject<THREE.Group | null>;
+  innerGlowRef: React.RefObject<THREE.PointLight | null>;
   scrollGroupRef: React.RefObject<THREE.Group | null>;
   stickRef: React.RefObject<THREE.Mesh | null>;
   ringSpeedMultRef: React.MutableRefObject<number>;
@@ -32,6 +34,8 @@ export const ShrineAltar3D: React.FC<ShrineAltar3DProps> = ({
   ringMatsRef,
   symbolMatsRef,
   boxGroupRef,
+  lidGroupRef,
+  innerGlowRef,
   scrollGroupRef,
   stickRef,
   ringSpeedMultRef,
@@ -68,11 +72,10 @@ export const ShrineAltar3D: React.FC<ShrineAltar3DProps> = ({
     }
 
     if (boxGroupRef.current && drawPhase === 'idle') {
-      boxGroupRef.current.position.y = 0.78 + Math.sin(t * 1.5) * 0.055;
+      boxGroupRef.current.position.y = 0.78 + Math.sin(t * 1.5) * 0.045;
     }
-    if (scrollGroupRef.current) {
-      scrollGroupRef.current.position.y = 1.85 + Math.sin(t * 1.9 + 0.7) * 0.05;
-      scrollGroupRef.current.rotation.y = Math.sin(t * 0.8) * 0.22;
+    if (scrollGroupRef.current && scrollGroupRef.current.visible) {
+      scrollGroupRef.current.rotation.y = Math.sin(t * 0.9) * 0.22;
     }
 
     if (boxGlowMatRef.current) {
@@ -88,8 +91,8 @@ export const ShrineAltar3D: React.FC<ShrineAltar3DProps> = ({
   return (
     <group
       ref={altarGroupRef}
-      position={isMobile ? [0.42, -1.15, 0.55] : [0.82, -1.58, 0.45]}
-      scale={isMobile ? 1.24 : 1.38}
+      position={isMobile ? [0, -0.82, 0.45] : [0.45, -1.52, 0.45]}
+      scale={isMobile ? 1.18 : 1.32}
       onPointerOver={(e) => {
         e.stopPropagation();
         hoveredRef.current = true;
@@ -183,11 +186,36 @@ export const ShrineAltar3D: React.FC<ShrineAltar3DProps> = ({
           <meshStandardMaterial color="#9f1239" roughness={0.78} metalness={0.05} />
         </mesh>
 
-        {/* Top Stick Dispenser Cap */}
-        <mesh position={[0, 0.6, 0]}>
-          <cylinderGeometry args={[0.13, 0.13, 0.035, 18]} />
-          <meshStandardMaterial color="#0e090d" roughness={0.75} />
-        </mesh>
+        {/* Mechanical Opening Lid Assembly (Phase 3) */}
+        <group ref={lidGroupRef} position={[0, 0.6, 0]}>
+          <mesh position={[0, 0, 0]} castShadow>
+            <cylinderGeometry args={[0.46, 0.48, 0.09, 6]} />
+            <meshStandardMaterial
+              color="#d4af37"
+              emissive="#92400e"
+              emissiveIntensity={0.3}
+              metalness={0.94}
+              roughness={0.16}
+            />
+          </mesh>
+          <mesh position={[0, 0.055, 0]}>
+            <cylinderGeometry args={[0.14, 0.14, 0.04, 18]} />
+            <meshStandardMaterial color="#0e090d" roughness={0.75} />
+          </mesh>
+          <mesh position={[0, 0.078, 0]}>
+            <torusGeometry args={[0.14, 0.02, 12, 24]} />
+            <meshStandardMaterial color="#fde68a" metalness={0.95} roughness={0.15} />
+          </mesh>
+        </group>
+
+        {/* Inner Golden Light Emerging When Lid Opens */}
+        <pointLight
+          ref={innerGlowRef}
+          position={[0, 0.65, 0]}
+          color="#fde68a"
+          intensity={0.2}
+          distance={4.5}
+        />
 
         {/* Front Engraved Kanji Talisman Plaque ("御神籤") */}
         <mesh position={[0, 0.02, 0.395]}>

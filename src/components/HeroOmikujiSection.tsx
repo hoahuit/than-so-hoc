@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { RotateCw, Flame, Compass } from 'lucide-react';
+import { RotateCw, Flame, Compass, FastForward } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { type OmikujiFortune, type PlanType, getRandomFortune } from '../data/omikujiData';
 import { shrineAudio } from '../utils/sound';
-import { SacredHeroCanvas } from './hero3d/SacredHeroCanvas';
+import { SacredHeroCanvas, type CeremonyPhase } from './hero3d/SacredHeroCanvas';
 
 interface HeroOmikujiSectionProps {
   selectedPlan: PlanType;
@@ -27,10 +27,12 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
   const [phase, setPhase] = useState<BoxPhase>('idle');
   const [ejectedStick, setEjectedStick] = useState<number | null>(null);
   const [lastDrawn, setLastDrawn] = useState<OmikujiFortune | null>(null);
-  const [introComplete, setIntroComplete] = useState<boolean>(false);
+  const [ceremonyPhase, setCeremonyPhase] = useState<CeremonyPhase>('arrival');
+  const [skipRequested, setSkipRequested] = useState<boolean>(false);
 
   const handleDraw = useCallback(() => {
     if (phase === 'shaking' || phase === 'ejecting') return;
+    setSkipRequested(true);
 
     const fortune = getRandomFortune(selectedPlan);
     setEjectedStick(fortune.stickNumber);
@@ -89,31 +91,53 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
     }
   }, []);
 
+  const isAnimatingIntro = ceremonyPhase !== 'complete';
+
   return (
     <section
       id="hero-omikuji-section"
-      className="relative h-screen min-h-[640px] max-h-[1080px] w-full overflow-hidden bg-[#0d0307]"
+      className="relative flex flex-col bg-[#0d0307] pt-16 pb-24 md:block md:h-screen md:min-h-[680px] md:max-h-[1080px] md:w-full md:overflow-hidden md:pt-0 md:pb-0"
     >
-      {/* ================= FULL-SCREEN UNIFIED 3D SHRINE ENVIRONMENT ================= */}
-      <SacredHeroCanvas
-        drawPhase={phase}
-        onAltarClick={handleDraw}
-        onIntroComplete={() => setIntroComplete(true)}
-      />
+      {/* ================= 3D STAGE: DEDICATED UPPER VIEWPORT ON MOBILE, FULLSCREEN ON DESKTOP ================= */}
+      <div className="relative h-[46vh] min-h-[290px] max-h-[410px] w-full shrink-0 overflow-hidden md:absolute md:inset-0 md:h-full md:max-h-none">
+        <SacredHeroCanvas
+          drawPhase={phase}
+          skipRequested={skipRequested}
+          onAltarClick={handleDraw}
+          onPhaseChange={setCeremonyPhase}
+        />
 
-      {/* Subtle Edge Vignette for Typography Contrast (Never Obstructs 3D Depth) */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0b0206]/85 via-transparent to-[#0b0206]/45" />
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-full md:w-2/3 bg-gradient-to-r from-[#0b0206]/70 via-[#0b0206]/25 to-transparent" />
+        {/* Subtle Desktop Edge Vignette for Left Typography (Zero overlap on mobile jar) */}
+        <div className="pointer-events-none hidden md:block md:absolute md:inset-0 bg-gradient-to-t from-[#0b0206]/85 via-transparent to-[#0b0206]/45" />
+        <div className="pointer-events-none hidden md:block md:absolute md:inset-y-0 md:left-0 md:w-2/3 bg-gradient-to-r from-[#0b0206]/75 via-[#0b0206]/25 to-transparent" />
 
-      {/* ================= INTEGRATED HERO UI OVERLAY ================= */}
-      <div className="pointer-events-none relative z-20 mx-auto flex h-full w-full flex-col justify-end px-4 pb-24 pt-20 sm:px-8 sm:pb-16 sm:pt-24 lg:px-14 xl:px-20">
-        <div
-          className={`pointer-events-auto max-w-xl space-y-3 sm:space-y-4 transition-all duration-700 ${
-            introComplete ? 'translate-y-0 opacity-100' : 'translate-y-1 opacity-95'
-          }`}
-        >
+        {/* Phase 4 Destiny Message Floating Pill (Top-Center, Clear of Jar) */}
+        {ceremonyPhase === 'message' && (
+          <div className="pointer-events-none absolute inset-x-4 top-3 md:top-20 z-30 flex justify-center">
+            <div className="rounded-full border border-brass-300/70 bg-black/75 px-4 py-1.5 text-xs sm:text-sm font-serif italic text-amber-100 shadow-gold-glow backdrop-blur-md">
+              Vận mệnh của bạn đang dần được khai mở...
+            </div>
+          </div>
+        )}
+
+        {/* Skip Intro Button (Non-blocking) */}
+        {isAnimatingIntro && (
+          <button
+            type="button"
+            onClick={() => setSkipRequested(true)}
+            className="absolute right-3 top-3 md:right-8 md:top-24 z-30 inline-flex items-center gap-1.5 rounded-full border border-brass-300/40 bg-black/55 px-3 py-1 text-[11px] font-semibold text-amber-100/90 backdrop-blur-md transition hover:border-brass-300 hover:bg-black/75"
+          >
+            <FastForward className="h-3 w-3 text-brass-300" />
+            <span>Bỏ qua</span>
+          </button>
+        )}
+      </div>
+
+      {/* ================= HERO CONTENT: BELOW 3D SCENE ON MOBILE, BOTTOM-LEFT OVERLAY ON DESKTOP ================= */}
+      <div className="relative z-20 flex flex-1 flex-col items-center justify-start px-4 pt-3 text-center md:pointer-events-none md:mx-auto md:flex md:h-full md:w-full md:items-start md:justify-end md:px-10 md:pb-14 md:pt-24 md:text-left lg:px-14 xl:px-20">
+        <div className="w-full max-w-lg space-y-3 sm:space-y-4 md:pointer-events-auto">
           {/* Compact Intent Selector Pills */}
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 sm:gap-2">
             {INTENT_TABS.map((tab) => {
               const isSelected = selectedPlan === tab.id;
               return (
@@ -126,8 +150,8 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
                   }}
                   className={`rounded-full px-3 py-1 text-[11px] sm:px-3.5 sm:text-xs font-semibold backdrop-blur-md transition-all duration-200 ${
                     isSelected
-                      ? 'border border-brass-400 bg-temple-900/80 text-amber-100 shadow-gold-glow'
-                      : 'border border-white/20 bg-black/35 text-white/80 hover:border-brass-300/60 hover:text-white'
+                      ? 'border border-brass-400 bg-temple-900/85 text-amber-100 shadow-gold-glow'
+                      : 'border border-white/20 bg-black/45 text-white/80 hover:border-brass-300/60 hover:text-white'
                   }`}
                 >
                   {tab.label}
@@ -142,20 +166,22 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
               Linh Xăm Khai Vận
             </h1>
             <p className="text-xs sm:text-base font-medium tracking-wide text-amber-100/90 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
-              Một thông điệp đang chờ bạn khám phá.
+              {ceremonyPhase === 'message'
+                ? 'Vận mệnh của bạn đang dần được khai mở...'
+                : 'Một thông điệp đang chờ bạn khám phá.'}
             </p>
           </div>
 
           {/* Lucky Number Reveal Pill (when drawn) */}
           {phase === 'finished' && lastDrawn && (
-            <div className="inline-flex items-center gap-3 rounded-full border border-brass-400/80 bg-black/70 px-4 py-2 text-xs sm:text-sm font-bold backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.65)]">
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-temple-700 to-temple-900 font-display font-black text-amber-100 border border-brass-400/50">
+            <div className="inline-flex items-center gap-2.5 rounded-full border border-brass-400/80 bg-black/75 px-4 py-1.5 text-xs sm:text-sm font-bold backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.65)]">
+              <span className="grid h-6 w-6 place-items-center rounded-full bg-gradient-to-br from-temple-700 to-temple-900 font-display font-black text-amber-100 border border-brass-400/50">
                 {lastDrawn.stickNumber}
               </span>
               <span className="text-amber-50">
-                Số {lastDrawn.stickNumber} · {lastDrawn.rank} ({lastDrawn.kanjiRank})
+                Quẻ số {lastDrawn.stickNumber} · {lastDrawn.rank} ({lastDrawn.kanjiRank})
               </span>
-              <Flame className="h-4 w-4 text-brass-400 animate-pulse" />
+              <Flame className="h-3.5 w-3.5 text-brass-400 animate-pulse" />
             </div>
           )}
 
@@ -166,13 +192,13 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
             </div>
           )}
 
-          {/* Primary & Secondary CTAs (Immediately Visible & Interactive) */}
-          <div className="flex flex-wrap items-center gap-3 pt-1">
+          {/* Primary & Secondary CTAs */}
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 sm:gap-3 pt-1">
             <button
               type="button"
               onClick={handleDraw}
               disabled={phase === 'shaking' || phase === 'ejecting'}
-              className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full border border-brass-300/80 bg-gradient-to-r from-[#a3221a] via-[#881611] to-[#5e0d09] px-7 py-3.5 text-sm sm:text-base font-black tracking-wide text-amber-50 shadow-[0_0_28px_rgba(212,175,55,0.32),0_10px_24px_rgba(0,0,0,0.7)] transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-200 hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-75"
+              className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full border border-brass-300/80 bg-gradient-to-r from-[#a3221a] via-[#881611] to-[#5e0d09] px-6 sm:px-7 py-3 sm:py-3.5 text-sm sm:text-base font-black tracking-wide text-amber-50 shadow-[0_0_28px_rgba(212,175,55,0.32),0_10px_24px_rgba(0,0,0,0.7)] transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-200 hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-75"
             >
               {phase === 'idle' || phase === 'finished' ? (
                 <>
@@ -194,7 +220,7 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
             <button
               type="button"
               onClick={handleExploreShrine}
-              className="inline-flex items-center gap-2 rounded-full border border-brass-300/45 bg-black/45 px-5 py-3.5 text-xs sm:text-sm font-semibold text-amber-100 backdrop-blur-md transition-all duration-200 hover:border-brass-300 hover:bg-black/65"
+              className="inline-flex items-center gap-2 rounded-full border border-brass-300/45 bg-black/50 px-5 py-3 sm:py-3.5 text-xs sm:text-sm font-semibold text-amber-100 backdrop-blur-md transition-all duration-200 hover:border-brass-300 hover:bg-black/70"
             >
               <Compass className="h-4 w-4 text-brass-300" />
               <span>Khám phá thần điện</span>
@@ -202,7 +228,7 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
           </div>
 
           <p className="text-[11px] text-amber-100/70 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
-            Kéo để xoay góc nhìn 3D · Chạm vào hộp xăm trên điện thờ hoặc nhấn Gieo Quẻ Ngay
+            Kéo để xoay góc nhìn 3D · Chạm vào hũ xăm hoặc nhấn Gieo Quẻ Ngay
           </p>
         </div>
       </div>
