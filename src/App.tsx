@@ -12,7 +12,8 @@ import { DailyFortune } from './components/DailyFortune';
 import { NumerologyCalculatorModal } from './components/NumerologyCalculatorModal';
 import { SavedFortunesDrawer, type SavedFortuneEntry } from './components/SavedFortunesDrawer';
 import { FloatingBottomNav } from './components/FloatingBottomNav';
-import { OMIKUJI_DATABASE, type OmikujiFortune, type PlanType } from './data/omikujiData';
+import { SealedFortuneIntro } from './components/SealedFortuneIntro';
+import { OMIKUJI_DATABASE, getRandomFortune, type OmikujiFortune, type PlanType } from './data/omikujiData';
 import { shrineAudio } from './utils/sound';
 
 const STORAGE_KEY = 'kami_no_su_saved_fortunes_v1';
@@ -25,6 +26,7 @@ export function App() {
   const [isShakeModalOpen, setIsShakeModalOpen] = useState<boolean>(false);
   const [isNumerologyOpen, setIsNumerologyOpen] = useState<boolean>(false);
   const [isSavedOpen, setIsSavedOpen] = useState<boolean>(false);
+  const [showSealedIntro, setShowSealedIntro] = useState<boolean>(false);
   const [activeMobileTab, setActiveMobileTab] = useState<'home' | 'plans' | 'numerology' | 'saved'>('home');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -105,6 +107,16 @@ export function App() {
     setFlipVersion((prev) => prev + 1);
   }, []);
 
+  const handleUnsealIntro = useCallback(() => {
+    const todayFortune = getRandomFortune(selectedPlan);
+    setCurrentFortune(todayFortune);
+    setFlipVersion((prev) => prev + 1);
+    setShowSealedIntro(false);
+    if (shrineAudio.bgMusicPlaying) {
+      setMusicOn(true);
+    }
+  }, [selectedPlan]);
+
   const handleOpenShakeModal = useCallback(() => {
     setIsShakeModalOpen(true);
   }, []);
@@ -169,6 +181,9 @@ export function App() {
 
   return (
     <div className="relative min-h-screen temple-bg text-ink selection:bg-temple-800 selection:text-white">
+      {/* First-3-Seconds Hook: Sealed Fortune Intro */}
+      <SealedFortuneIntro isVisible={showSealedIntro} onUnseal={handleUnsealIntro} />
+
       {/* Subtle Floating Petals Canvas */}
       <PetalsCanvas />
 
@@ -183,7 +198,7 @@ export function App() {
         onToggleMusic={handleToggleMusic}
       />
 
-      {/* ================= 1. HERO SECTION: 70% BIG OMIKUJI BOX + 30% TITLE ================= */}
+      {/* ================= 1. HERO SECTION: DIVINE FORTUNE CORE 3D ================= */}
       <div id="hero-omikuji-section">
         <HeroOmikujiSection
           selectedPlan={selectedPlan}

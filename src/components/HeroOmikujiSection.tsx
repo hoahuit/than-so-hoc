@@ -1,8 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { RotateCw, Flame } from 'lucide-react';
+import { RotateCw, Flame, Compass } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { type OmikujiFortune, type PlanType, getRandomFortune } from '../data/omikujiData';
 import { shrineAudio } from '../utils/sound';
+import { SacredHeroCanvas } from './hero3d/SacredHeroCanvas';
 
 interface HeroOmikujiSectionProps {
   selectedPlan: PlanType;
@@ -26,6 +27,7 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
   const [phase, setPhase] = useState<BoxPhase>('idle');
   const [ejectedStick, setEjectedStick] = useState<number | null>(null);
   const [lastDrawn, setLastDrawn] = useState<OmikujiFortune | null>(null);
+  const [introComplete, setIntroComplete] = useState<boolean>(false);
 
   const handleDraw = useCallback(() => {
     if (phase === 'shaking' || phase === 'ejecting') return;
@@ -35,7 +37,6 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
     setLastDrawn(fortune);
     setPhase('shaking');
 
-    // Realistic bamboo rattle sounds inside hexagonal box
     shrineAudio.playBoxShake();
     const shake2 = setTimeout(() => {
       shrineAudio.playBoxShake();
@@ -66,13 +67,12 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
       setPhase('finished');
       onFortuneDrawn(fortune);
 
-      // Smooth scroll to fortune result section
       setTimeout(() => {
         const el = document.getElementById('fortune-result-section');
         if (el) {
           el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-      }, 400);
+      }, 450);
     }, 2100);
 
     return () => {
@@ -82,47 +82,38 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
     };
   }, [phase, selectedPlan, onFortuneDrawn]);
 
+  const handleExploreShrine = useCallback(() => {
+    const el = document.getElementById('fortune-result-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, []);
+
   return (
-    <section id="hero-omikuji-section" className="relative min-h-[92vh] sm:min-h-screen overflow-hidden pt-20 pb-12 sm:pt-24 sm:pb-16 flex flex-col justify-between">
-      {/* ================= BACKGROUND SHRINE IMAGE ================= */}
-      <img
-        src="/images/hero-shrine.jpg"
-        alt="Đền Thần Sensoji Nhật Bản dưới trăng rằm và cổng Torii"
-        className="absolute inset-0 h-full w-full object-cover object-center filter brightness-[0.72] contrast-[1.08]"
+    <section
+      id="hero-omikuji-section"
+      className="relative h-screen min-h-[640px] max-h-[1080px] w-full overflow-hidden bg-[#0d0307]"
+    >
+      {/* ================= FULL-SCREEN UNIFIED 3D SHRINE ENVIRONMENT ================= */}
+      <SacredHeroCanvas
+        drawPhase={phase}
+        onAltarClick={handleDraw}
+        onIntroComplete={() => setIntroComplete(true)}
       />
 
-      {/* Atmospheric Overlays: Senso-ji Vermilion & Night Vignette */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#180306]/85 via-[#2b080f]/60 to-[#120205]/95 pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_60%,rgba(203,161,53,0.14)_0%,transparent_70%)] pointer-events-none" />
-      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#120205] to-transparent pointer-events-none" />
+      {/* Subtle Edge Vignette for Typography Contrast (Never Obstructs 3D Depth) */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0b0206]/85 via-transparent to-[#0b0206]/45" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-full md:w-2/3 bg-gradient-to-r from-[#0b0206]/70 via-[#0b0206]/25 to-transparent" />
 
-      {/* Top Traditional Sensoji Vermilion Beam Accent */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-brass-400 via-temple-600 to-brass-400 opacity-80" />
-
-      {/* ================= FOREGROUND HERO CONTENT ================= */}
-      <div className="relative z-10 mx-auto w-full px-4 sm:px-8 lg:px-12 xl:px-16 flex flex-col items-center justify-between flex-1">
-
-        {/* ================= 30% TITLE & INTENT SELECTION ================= */}
-        <div className="w-full max-w-2xl text-center flex flex-col items-center space-y-2.5 sm:space-y-3 mb-2">
-
-
-          {/* Main Title in Vietnamese */}
-          <h1 className="font-sans text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight text-transparent bg-clip-text bg-gradient-to-r from-[#fff9ed] via-[#fde7b0] to-[#dfb84b] drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]">
-            Linh Xăm Khai Vận
-          </h1>
-
-          {/* Clean, Poetic Subtitle without emojis */}
-          <div className="space-y-1">
-            <p className="text-sm sm:text-base text-amber-100 font-bold drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)] tracking-wide">
-              Một thông điệp chỉ dẫn dành riêng cho bạn lúc này
-            </p>
-            <p className="text-xs text-amber-200/80 max-w-md mx-auto drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
-              Lắng nghe tiếng vọng vũ trụ · Khám phá vận trình trong 30 ngày tới
-            </p>
-          </div>
-
-          {/* Clean Intent Tabs without icons */}
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-2">
+      {/* ================= INTEGRATED HERO UI OVERLAY ================= */}
+      <div className="pointer-events-none relative z-20 mx-auto flex h-full w-full flex-col justify-end px-4 pb-24 pt-20 sm:px-8 sm:pb-16 sm:pt-24 lg:px-14 xl:px-20">
+        <div
+          className={`pointer-events-auto max-w-xl space-y-3 sm:space-y-4 transition-all duration-700 ${
+            introComplete ? 'translate-y-0 opacity-100' : 'translate-y-1 opacity-95'
+          }`}
+        >
+          {/* Compact Intent Selector Pills */}
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
             {INTENT_TABS.map((tab) => {
               const isSelected = selectedPlan === tab.id;
               return (
@@ -133,122 +124,86 @@ export const HeroOmikujiSection: React.FC<HeroOmikujiSectionProps> = ({
                     shrineAudio.playShrineBell();
                     onSelectPlan(tab.id);
                   }}
-                  className={`rounded-full px-4 py-1.5 text-xs font-semibold backdrop-blur-md transition-all duration-200 ${isSelected
-                    ? 'bg-gradient-to-r from-temple-800 to-temple-700 text-amber-100 shadow-temple-red border border-brass-400 ring-1 ring-brass-400/50 scale-105 font-bold'
-                    : 'bg-black/35 text-white/85 border border-white/20 hover:border-brass-300/60 hover:text-white hover:bg-black/50'
-                    }`}
+                  className={`rounded-full px-3 py-1 text-[11px] sm:px-3.5 sm:text-xs font-semibold backdrop-blur-md transition-all duration-200 ${
+                    isSelected
+                      ? 'border border-brass-400 bg-temple-900/80 text-amber-100 shadow-gold-glow'
+                      : 'border border-white/20 bg-black/35 text-white/80 hover:border-brass-300/60 hover:text-white'
+                  }`}
                 >
-                  <span>{tab.label}</span>
+                  {tab.label}
                 </button>
               );
             })}
           </div>
-        </div>
 
-        {/* ================= 70% BIG OMIKUJI BOX SHOWCASE ================= */}
-        <div className="relative w-full max-w-2xl flex flex-col items-center justify-center my-auto py-2">
-          {/* Interactive Omikuji Box Stage */}
-          <div
-            onClick={handleDraw}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') handleDraw();
-            }}
-            aria-label="Lắc hũ rút xăm"
-            className="relative flex h-[380px] w-[330px] sm:h-[480px] sm:w-[420px] md:h-[530px] md:w-[470px] cursor-pointer items-center justify-center select-none group focus:outline-none"
-          >
-            {/* Concentric Golden Halo Rings */}
-            <div
-              className={`pointer-events-none absolute inset-6 sm:inset-4 rounded-full border border-dashed border-brass-400/50 transition-transform duration-700 ${phase === 'shaking' ? 'animate-spin scale-110 border-brass-300' : 'animate-spin-slow'
-                }`}
-            />
-            <div
-              className={`pointer-events-none absolute inset-16 sm:inset-12 rounded-full border border-brass-300/30 ${phase === 'shaking' ? 'animate-ping opacity-50' : 'animate-spin-reverse-slow'
-                }`}
-            />
-
-            {/* Sacred Radiant Amber Glow behind Box */}
-            <div
-              className={`pointer-events-none absolute h-64 w-64 sm:h-80 sm:w-80 rounded-full bg-gradient-to-tr from-temple-600/40 via-brass-400/35 to-amber-200/30 blur-3xl transition-transform duration-500 ${phase === 'shaking' ? 'scale-135' : 'scale-100 group-hover:scale-110'
-                }`}
-            />
-
-            {/* High-Resolution Omikuji Box Image (70% Visual Prominence) */}
-            <div
-              className={`relative z-20 h-full w-full p-2 transition-transform duration-300 ${phase === 'shaking'
-                ? 'animate-ritual-shake'
-                : phase === 'ejecting'
-                  ? 'animate-ritual-tilt'
-                  : 'animate-float group-hover:scale-105'
-                }`}
-            >
-              <img
-                src="/images/omikuji-box.png"
-                alt="Hũ xăm gỗ Omikuji đền Asakusa Nhật Bản"
-                className="h-full w-full object-contain drop-shadow-[0_24px_45px_rgba(0,0,0,0.85)] filter contrast-[1.05]"
-              />
-            </div>
-
-            {/* BAMBOO STICK EJECTING WITH DRAWN LUCKY NUMBER */}
-            {phase === 'ejecting' && ejectedStick !== null && (
-              <div className="pointer-events-none absolute left-1/2 top-1/2 z-30 -ml-7 -mt-10 animate-stick-fall">
-                <div className="relative flex h-52 w-14 flex-col items-center justify-between rounded-md border-2 border-brass-400 bg-gradient-to-b from-[#fffef5] via-[#fde7b7] to-[#dfb84b] py-3 text-temple-950 shadow-[0_20px_45px_rgba(0,0,0,0.85)]">
-                  <span className="h-3 w-full bg-temple-800" />
-                  <span className="vertical font-jp text-lg font-black tracking-[0.25em] text-temple-950">
-                    第{String(ejectedStick).padStart(2, '0')}番
-                  </span>
-                  <span className="rounded-full bg-temple-800 px-2.5 py-0.5 text-xs font-black text-amber-200 shadow-sm">
-                    吉
-                  </span>
-                </div>
-              </div>
-            )}
+          {/* Main Title & Supporting Copy */}
+          <div className="space-y-1.5 sm:space-y-2">
+            <h1 className="font-serif text-3xl font-black tracking-tight leading-none text-transparent bg-clip-text bg-gradient-to-r from-[#fff8e7] via-[#fde7b0] to-[#d4af37] drop-shadow-[0_4px_22px_rgba(0,0,0,0.9)] sm:text-5xl lg:text-6xl">
+              Linh Xăm Khai Vận
+            </h1>
+            <p className="text-xs sm:text-base font-medium tracking-wide text-amber-100/90 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+              Một thông điệp đang chờ bạn khám phá.
+            </p>
           </div>
 
-          {/* Lucky Number Reveal Banner (When Finished) */}
+          {/* Lucky Number Reveal Pill (when drawn) */}
           {phase === 'finished' && lastDrawn && (
-            <div className="my-2 inline-flex items-center gap-3 rounded-full border border-brass-400/90 bg-black/75 backdrop-blur-md px-5 py-2.5 text-sm font-bold shadow-[0_10px_30px_rgba(0,0,0,0.7)] animate-card-bloom">
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-temple-700 to-temple-900 text-amber-100 font-display font-black text-base shadow-sm border border-brass-400/50">
+            <div className="inline-flex items-center gap-3 rounded-full border border-brass-400/80 bg-black/70 px-4 py-2 text-xs sm:text-sm font-bold backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.65)]">
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-temple-700 to-temple-900 font-display font-black text-amber-100 border border-brass-400/50">
                 {lastDrawn.stickNumber}
               </span>
-              <div className="text-left">
-                <span className="block text-[11px] text-amber-200/90">Con số may mắn của bạn:</span>
-                <span className="text-white font-extrabold text-sm sm:text-base">
-                  Số {lastDrawn.stickNumber} · {lastDrawn.rank} ({lastDrawn.kanjiRank})
-                </span>
-              </div>
+              <span className="text-amber-50">
+                Số {lastDrawn.stickNumber} · {lastDrawn.rank} ({lastDrawn.kanjiRank})
+              </span>
               <Flame className="h-4 w-4 text-brass-400 animate-pulse" />
             </div>
           )}
 
-          {/* Primary Action Button (Clean, no emoji) */}
-          <div className="mt-2 sm:mt-3 flex flex-col items-center gap-2 w-full max-w-sm">
+          {/* Ejecting Stick Indicator */}
+          {phase === 'ejecting' && ejectedStick !== null && (
+            <div className="inline-flex items-center gap-2 rounded-full border border-brass-400/70 bg-black/75 px-4 py-1.5 text-xs font-bold text-amber-200 backdrop-blur-md">
+              Thẻ tre số {String(ejectedStick).padStart(2, '0')} đang xuất hiện...
+            </div>
+          )}
+
+          {/* Primary & Secondary CTAs (Immediately Visible & Interactive) */}
+          <div className="flex flex-wrap items-center gap-3 pt-1">
             <button
               type="button"
               onClick={handleDraw}
               disabled={phase === 'shaking' || phase === 'ejecting'}
-              className="group relative inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#b32b1b] via-[#9e2717] to-[#7a180b] px-8 py-3.5 sm:py-4 text-base sm:text-lg font-black text-amber-100 shadow-[0_12px_28px_rgba(158,39,23,0.55)] border border-[#cba135]/60 transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-75"
+              className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full border border-brass-300/80 bg-gradient-to-r from-[#a3221a] via-[#881611] to-[#5e0d09] px-7 py-3.5 text-sm sm:text-base font-black tracking-wide text-amber-50 shadow-[0_0_28px_rgba(212,175,55,0.32),0_10px_24px_rgba(0,0,0,0.7)] transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-200 hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-75"
             >
               {phase === 'idle' || phase === 'finished' ? (
                 <>
-                  <span className="tracking-wide">Gieo Quẻ</span>
-                  <span className="text-amber-300 font-bold ml-1">›</span>
+                  <span>Gieo Quẻ Ngay</span>
+                  <span className="text-amber-300 transition-transform duration-200 group-hover:translate-x-0.5">
+                    ›
+                  </span>
                 </>
               ) : (
                 <>
-                  <RotateCw className="h-5 w-5 animate-spin text-brass-200" />
-                  <span className="tracking-wide">
+                  <RotateCw className="h-4 w-4 animate-spin text-brass-200" />
+                  <span>
                     {phase === 'shaking' ? 'Đang gieo quẻ...' : 'Thẻ tre đang rơi...'}
                   </span>
                 </>
               )}
             </button>
 
-            <p className="text-[11px] text-amber-100/80 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] tracking-wide">
-              Chạm vào hũ xăm hoặc  Gieo Quẻ để xem thông điệp
-            </p>
+            <button
+              type="button"
+              onClick={handleExploreShrine}
+              className="inline-flex items-center gap-2 rounded-full border border-brass-300/45 bg-black/45 px-5 py-3.5 text-xs sm:text-sm font-semibold text-amber-100 backdrop-blur-md transition-all duration-200 hover:border-brass-300 hover:bg-black/65"
+            >
+              <Compass className="h-4 w-4 text-brass-300" />
+              <span>Khám phá thần điện</span>
+            </button>
           </div>
+
+          <p className="text-[11px] text-amber-100/70 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
+            Kéo để xoay góc nhìn 3D · Chạm vào hộp xăm trên điện thờ hoặc nhấn Gieo Quẻ Ngay
+          </p>
         </div>
       </div>
     </section>

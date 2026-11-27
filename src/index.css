@@ -188,3 +188,62 @@
 .animate-twinkle-slow {
   animation: starTwinkle 4s ease-in-out infinite;
 }
+
+/* ===================== SEALED FORTUNE INTRO (FIRST 3S HOOK) ===================== */
+@keyframes sealLightLeak {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(0.96);
+    filter: brightness(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+    filter: brightness(1.25);
+  }
+}
+
+@keyframes sealRaysSpin {
+  0%   { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+  50%  { transform: translate(-50%, -50%) rotate(180deg) scale(1.08); }
+  100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); }
+}
+
+@keyframes emberDrift {
+  0% {
+    transform: translateY(16px) translateX(0px) scale(0.6);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.85;
+  }
+  75% {
+    opacity: 0.65;
+  }
+  100% {
+    transform: translateY(-90px) translateX(12px) scale(1.1);
+    opacity: 0;
+  }
+}
+
+@keyframes ctaShimmerSweep {
+  0%   { transform: translateX(-140%) skewX(-18deg); }
+  45%  { transform: translateX(220%) skewX(-18deg); }
+  100% { transform: translateX(220%) skewX(-18deg); }
+}
+
+.animate-seal-leak {
+  animation: sealLightLeak 2.8s ease-in-out infinite;
+}
+
+.animate-seal-rays {
+  animation: sealRaysSpin 22s linear infinite;
+}
+
+.animate-ember-drift {
+  animation: emberDrift 4.2s ease-in-out infinite;
+}
+
+.animate-cta-shimmer {
+  animation: ctaShimmerSweep 3.4s ease-in-out infinite;
+}
