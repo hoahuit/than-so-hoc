@@ -204,14 +204,14 @@ const CinematicSceneDirector: React.FC<DirectorProps> = ({
 
     const jarCenter = isMobile
       ? { x: 0, y: -0.82, z: 0.35 }
-      : { x: 0.45, y: -1.48, z: 0.35 };
+      : { x: 0.32, y: -1.48, z: 0.35 };
     const finalCamPos = isMobile
       ? { x: 0, y: 0.25, z: 5.5 }
       : { x: -0.25, y: 0.25, z: 5.8 };
     const angelRestPos = isMobile
-      ? { x: -0.92, y: -0.78, z: 0.1 }
-      : { x: -1.35, y: -1.4, z: 0.1 };
-    const angelScale = isMobile ? 0.85 : 1.1;
+      ? { x: -1.05, y: -0.68, z: 0.05 }
+      : { x: -1.55, y: -1.25, z: 0.05 };
+    const angelScale = isMobile ? 0.72 : 0.92;
 
     if (prefersReducedMotion) {
       camera.position.set(finalCamPos.x, finalCamPos.y, finalCamPos.z);
@@ -241,14 +241,14 @@ const CinematicSceneDirector: React.FC<DirectorProps> = ({
       return;
     }
 
-    // Initial Frame Setup: Full-screen Angel in Center, Jar hidden until Phase 3
+    // Initial Frame Setup: Omikuji Jar is the Centerpiece from start; Angel glides in smoothly
     introDoneRef.current = false;
-    angelPoseRef.current = 'arrival';
+    angelPoseRef.current = 'fly';
     angelOpacityRef.current = 1;
     orbitStateRef.current.progress = 0;
 
-    camera.position.set(0, 0.35, 4.3);
-    backdropMat.opacity = 0.25;
+    camera.position.set(finalCamPos.x, finalCamPos.y + 0.12, finalCamPos.z + 0.45);
+    backdropMat.opacity = 0.35;
 
     lanternLightsRef.current.forEach((l) => {
       if (l) {
@@ -257,26 +257,26 @@ const CinematicSceneDirector: React.FC<DirectorProps> = ({
       }
     });
 
-    angelGroup.position.set(0, -1.15, 2.2);
-    angelGroup.scale.set(angelScale * 1.15, angelScale * 1.15, angelScale * 1.15);
-    angelGroup.quaternion.setFromEuler(new THREE.Euler(0, 0, 0));
+    angelGroup.position.set(jarCenter.x + 2.2, 1.35, -1.4);
+    angelGroup.scale.set(angelScale, angelScale, angelScale);
+    angelGroup.quaternion.setFromEuler(new THREE.Euler(0, -0.3, 0));
 
-    altarGroup.visible = false;
-    altarGroup.position.set(jarCenter.x, jarCenter.y - 1.2, jarCenter.z);
-    ringsGroup.scale.set(0.3, 0.3, 0.3);
+    altarGroup.visible = true;
+    altarGroup.position.set(jarCenter.x, jarCenter.y, jarCenter.z);
+    ringsGroup.scale.set(0.75, 0.75, 0.75);
     ringMatsRef.current.forEach((m) => {
-      if (m) m.opacity = 0;
+      if (m) m.opacity = 0.65;
     });
     symbolMatsRef.current.forEach((m) => {
-      if (m) m.opacity = 0;
+      if (m) m.opacity = 0.65;
     });
 
     lidGroup.position.set(0, 0.6, 0);
     lidGroup.rotation.set(0, 0, 0);
-    if (innerGlow) innerGlow.intensity = 0.2;
+    if (innerGlow) innerGlow.intensity = 0.8;
     scrollGroup.position.set(0, 0.72, 0);
     scrollGroup.scale.set(0.01, 0.01, 0.01);
-    burstLight.intensity = 0.8;
+    burstLight.intensity = 1.6;
     ringSpeedMultRef.current = 1;
 
     const tl = gsap.timeline({
@@ -288,19 +288,27 @@ const CinematicSceneDirector: React.FC<DirectorProps> = ({
     });
     timelineRef.current = tl;
 
-    // ===== PHASE 1: FULL-SCREEN ANGEL ARRIVAL (0.0 – 2.0s) =====
+    // ===== PHASE 1: SMOOTH ARRIVAL & JAR GLOW (0.0 – 1.8s) =====
     tl.call(() => onPhaseChange?.('arrival'), [], 0)
       .to(backdropMat, { opacity: 1, duration: 1.4, ease: 'power2.out' }, 0)
       .to(
         angelGroup.position,
-        { y: -0.92, z: 2.0, duration: 1.8, ease: 'power2.out' },
+        {
+          x: jarCenter.x + (isMobile ? 1.15 : 1.75),
+          y: jarCenter.y + 0.65,
+          z: jarCenter.z + 0.35,
+          duration: 1.7,
+          ease: 'sine.inOut',
+        },
         0
       )
       .to(
-        camera.position,
-        { y: 0.28, z: 4.55, duration: 1.8, ease: 'power2.out' },
-        0
-      );
+        ringsGroup.scale,
+        { x: 1, y: 1, z: 1, duration: 1.4, ease: 'power2.out' },
+        0.2
+      )
+      .to(ringMatsRef.current.filter(Boolean), { opacity: 1, duration: 1.0 }, 0.2)
+      .to(symbolMatsRef.current.filter(Boolean), { opacity: 1, duration: 1.0 }, 0.3);
 
     lanternLightsRef.current.forEach((light, idx) => {
       if (light) {
@@ -308,97 +316,59 @@ const CinematicSceneDirector: React.FC<DirectorProps> = ({
           light,
           {
             intensity: 1.65,
-            duration: 0.4,
+            duration: 0.45,
             onStart: () => {
               light.userData.awakened = true;
             },
           },
-          0.3 + idx * 0.1
+          0.2 + idx * 0.15
         );
       }
     });
 
-    // ===== PHASE 2: ANGEL SPEAKS (2.0 – 4.0s) =====
+    // ===== PHASE 2-3: SLOW, SILKY-SMOOTH WING-FLAPPING FLIGHT AROUND THE JAR (1.8 – 6.2s) =====
     tl.call(
       () => {
-        angelPoseRef.current = 'speak';
+        angelPoseRef.current = 'fly';
         onPhaseChange?.('speak1');
       },
       [],
-      2.0
+      1.8
     )
-      .call(() => onPhaseChange?.('speak2'), [], 2.7)
-      .call(() => onPhaseChange?.('speak3'), [], 3.35);
-
-    // ===== PHASE 3: ANGEL FLIES AROUND OMIKUJI JAR IN REAL 3D ELLIPTICAL TRAJECTORY (4.0 – 6.2s) =====
-    tl.call(
-      () => {
-        onPhaseChange?.('fly');
-        angelPoseRef.current = 'fly';
-        altarGroup.visible = true;
-      },
-      [],
-      4.0
-    )
-      .to(
-        camera.position,
-        {
-          x: finalCamPos.x,
-          y: finalCamPos.y + 0.15,
-          z: finalCamPos.z + 0.35,
-          duration: 1.0,
-          ease: 'power2.inOut',
-        },
-        4.0
-      )
-      .to(
-        altarGroup.position,
-        { y: jarCenter.y, duration: 0.85, ease: 'back.out(1.2)' },
-        4.0
-      )
-      .to(
-        angelGroup.scale,
-        { x: angelScale, y: angelScale, z: angelScale, duration: 0.7, ease: 'power2.out' },
-        4.0
-      )
+      .call(() => onPhaseChange?.('speak2'), [], 3.0)
+      .call(() => onPhaseChange?.('fly'), [], 4.2)
       .to(
         orbitStateRef.current,
         {
           progress: 1,
-          duration: 2.2,
-          ease: 'power1.inOut',
+          duration: 4.4,
+          ease: 'sine.inOut',
           onUpdate: () => {
             const p = orbitStateRef.current.progress;
-            // Elliptical path:
-            // p=0: start right-front -> behind (PI*0.5) -> left (PI) -> foreground (1.5*PI) -> right (2*PI) -> descend to left-beside
-            const rx = isMobile ? 1.15 : 1.75;
-            const rz = isMobile ? 1.15 : 1.65;
-            const angle = Math.PI * 0.15 + p * Math.PI * 2.15;
+            const rx = isMobile ? 1.25 : 1.85;
+            const rz = isMobile ? 1.2 : 1.75;
+            const angle = p * Math.PI * 2.15;
 
             const x = jarCenter.x + Math.cos(angle) * rx;
-            const z = jarCenter.z - Math.sin(angle) * rz; // negative sin goes behind jar first (-z), then left, then foreground (+z), then right!
-            const y = jarCenter.y + 0.55 * Math.sin(p * Math.PI) + (1 - p) * 0.25;
+            const z = jarCenter.z - Math.sin(angle) * rz;
+            const y = jarCenter.y + 0.52 + Math.sin(p * Math.PI * 2) * 0.16;
 
             prevPosVec.copy(angelGroup.position);
             nextPosVec.set(x, y, z);
             angelGroup.position.copy(nextPosVec);
 
-            // Compute tangent orientation with real Quaternion slerp
             if (nextPosVec.distanceToSquared(prevPosVec) > 0.00001) {
               lookMatrix.lookAt(nextPosVec, prevPosVec, upVec);
               targetQuat.setFromRotationMatrix(lookMatrix);
-              angelGroup.quaternion.slerp(targetQuat, 0.18);
+              angelGroup.quaternion.slerp(targetQuat, 0.08);
             }
           },
         },
-        4.0
+        1.8
       )
-      .to(ringsGroup.scale, { x: 1, y: 1, z: 1, duration: 0.8, ease: 'back.out(1.3)' }, 4.3)
-      .to(ringMatsRef.current.filter(Boolean), { opacity: 1, duration: 0.6 }, 4.3)
-      .to(symbolMatsRef.current.filter(Boolean), { opacity: 1, duration: 0.6 }, 4.4)
-      .to(ringSpeedMultRef, { current: 2.3, duration: 0.6, ease: 'power2.inOut' }, 4.4);
+      .to(ringSpeedMultRef, { current: 1.8, duration: 1.2, ease: 'sine.inOut' }, 2.2);
 
-    // ===== PHASE 4: ANGEL STANDS BESIDE JAR & ACTIVATES FORTUNE (6.2 – 7.5s) =====
+    // ===== PHASE 4: GENTLE DESCENT BESIDE THE JAR & JAR ACTIVATION (6.2 – 7.8s) =====
     tl.call(
       () => {
         onPhaseChange?.('present');
@@ -413,56 +383,56 @@ const CinematicSceneDirector: React.FC<DirectorProps> = ({
           x: angelRestPos.x,
           y: angelRestPos.y,
           z: angelRestPos.z,
-          duration: 0.9,
-          ease: 'power3.out',
+          duration: 1.3,
+          ease: 'sine.inOut',
           onUpdate: () => {
             targetQuat.setFromEuler(new THREE.Euler(0, 0.34, 0));
-            angelGroup.quaternion.slerp(targetQuat, 0.14);
+            angelGroup.quaternion.slerp(targetQuat, 0.08);
           },
         },
         6.2
       )
-      .to(innerGlow || {}, { intensity: 4.5, duration: 0.6, ease: 'power2.in' }, 6.3)
+      .to(innerGlow || {}, { intensity: 4.0, duration: 0.7, ease: 'power2.inOut' }, 6.3)
       .to(
         lidGroup.position,
-        { y: 0.88, x: -0.18, duration: 0.7, ease: 'power2.out' },
+        { y: 0.88, x: -0.18, duration: 0.85, ease: 'power2.out' },
         6.4
       )
-      .to(lidGroup.rotation, { z: 0.55, duration: 0.7, ease: 'power2.out' }, 6.4)
-      .to(scrollGroup.position, { y: 1.88, duration: 0.85, ease: 'power3.out' }, 6.5)
-      .to(scrollGroup.scale, { x: 1, y: 1, z: 1, duration: 0.75, ease: 'back.out(1.5)' }, 6.5);
+      .to(lidGroup.rotation, { z: 0.55, duration: 0.85, ease: 'power2.out' }, 6.4)
+      .to(scrollGroup.position, { y: 1.88, duration: 0.95, ease: 'power3.out' }, 6.5)
+      .to(scrollGroup.scale, { x: 1, y: 1, z: 1, duration: 0.85, ease: 'back.out(1.4)' }, 6.5);
 
-    // ===== PHASE 5: TRANSITION INTO MAIN HOMEPAGE HERO (7.5 – 8.0s) =====
+    // ===== PHASE 5: SMOOTH SETTLE INTO IDLE (7.8 – 8.5s) =====
     tl.call(
       () => {
         if (waterRipple && waterRippleMat) {
           waterRipple.visible = true;
           waterRipple.scale.set(0.4, 0.4, 0.4);
-          waterRippleMat.opacity = 0.85;
+          waterRippleMat.opacity = 0.8;
         }
       },
       [],
-      7.3
+      7.5
     )
       .to(
         burstLight,
-        { intensity: 7.5, duration: 0.25, yoyo: true, repeat: 1, ease: 'power2.out' },
-        7.3
+        { intensity: 6.5, duration: 0.3, yoyo: true, repeat: 1, ease: 'sine.inOut' },
+        7.5
       )
       .to(
         waterRipple ? waterRipple.scale : {},
-        { x: 3.6, y: 3.6, z: 3.6, duration: 0.75, ease: 'power3.out' },
-        7.3
+        { x: 3.6, y: 3.6, z: 3.6, duration: 0.9, ease: 'power2.out' },
+        7.5
       )
-      .to(waterRippleMat || {}, { opacity: 0, duration: 0.7, ease: 'power2.out' }, 7.32)
+      .to(waterRippleMat || {}, { opacity: 0, duration: 0.85, ease: 'power2.out' }, 7.55)
       .to(
         camera.position,
-        { x: finalCamPos.x, y: finalCamPos.y, z: finalCamPos.z, duration: 0.7, ease: 'power3.out' },
-        7.3
+        { x: finalCamPos.x, y: finalCamPos.y, z: finalCamPos.z, duration: 0.9, ease: 'sine.inOut' },
+        7.5
       )
-      .to(ringSpeedMultRef, { current: 1.0, duration: 0.7, ease: 'power2.out' }, 7.3)
-      .to(innerGlow || {}, { intensity: 2.0, duration: 0.5, ease: 'power2.out' }, 7.5)
-      .to(burstLight, { intensity: 2.6, duration: 0.5, ease: 'power2.out' }, 7.5);
+      .to(ringSpeedMultRef, { current: 1.0, duration: 0.9, ease: 'power2.out' }, 7.5)
+      .to(innerGlow || {}, { intensity: 2.0, duration: 0.6, ease: 'power2.out' }, 7.8)
+      .to(burstLight, { intensity: 2.6, duration: 0.6, ease: 'power2.out' }, 7.8);
 
     return () => {
       tl.kill();

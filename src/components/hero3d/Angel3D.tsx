@@ -122,15 +122,35 @@ export const Angel3D: React.FC<Angel3DProps> = ({
       rightEyeRef.current.scale.y = THREE.MathUtils.lerp(rightEyeRef.current.scale.y, eyeY, 0.45);
     }
 
-    // Dramatic wing flapping
-    const flapSpeed = mode === 'fly' ? 5.8 : 2.3;
-    const flapAmp = mode === 'fly' ? 0.42 : 0.14;
-    const flap = Math.sin(t * flapSpeed) * flapAmp;
+    // Smooth, majestic wing flapping (3D Y-sweep + Z-lift arc)
+    const targetFlapSpeed = mode === 'fly' ? 3.2 : 1.85;
+    const targetFlapAmp = mode === 'fly' ? 0.52 : 0.22;
+    const flap = Math.sin(t * targetFlapSpeed) * targetFlapAmp;
+    const wingLift = Math.cos(t * targetFlapSpeed) * (mode === 'fly' ? 0.14 : 0.06);
+
     if (leftWingRef.current) {
-      leftWingRef.current.rotation.y = -0.32 - flap;
+      leftWingRef.current.rotation.y = THREE.MathUtils.lerp(
+        leftWingRef.current.rotation.y,
+        -0.38 - flap,
+        0.12
+      );
+      leftWingRef.current.rotation.z = THREE.MathUtils.lerp(
+        leftWingRef.current.rotation.z,
+        wingLift,
+        0.12
+      );
     }
     if (rightWingRef.current) {
-      rightWingRef.current.rotation.y = 0.32 + flap;
+      rightWingRef.current.rotation.y = THREE.MathUtils.lerp(
+        rightWingRef.current.rotation.y,
+        0.38 + flap,
+        0.12
+      );
+      rightWingRef.current.rotation.z = THREE.MathUtils.lerp(
+        rightWingRef.current.rotation.z,
+        -wingLift,
+        0.12
+      );
     }
 
     // Arm & Scepter gestures

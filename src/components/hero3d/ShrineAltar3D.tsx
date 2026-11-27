@@ -91,8 +91,8 @@ export const ShrineAltar3D: React.FC<ShrineAltar3DProps> = ({
   return (
     <group
       ref={altarGroupRef}
-      position={isMobile ? [0, -0.82, 0.45] : [0.45, -1.52, 0.45]}
-      scale={isMobile ? 1.18 : 1.32}
+      position={isMobile ? [0, -0.82, 0.35] : [0.32, -1.48, 0.35]}
+      scale={isMobile ? 1.24 : 1.42}
       onPointerOver={(e) => {
         e.stopPropagation();
         hoveredRef.current = true;
