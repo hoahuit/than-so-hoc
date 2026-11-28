@@ -203,15 +203,15 @@ const CinematicSceneDirector: React.FC<DirectorProps> = ({
     }
 
     const jarCenter = isMobile
-      ? { x: 0, y: -0.82, z: 0.35 }
+      ? { x: 0.14, y: -1.12, z: 0.35 }
       : { x: 0.32, y: -1.48, z: 0.35 };
     const finalCamPos = isMobile
-      ? { x: 0, y: 0.28, z: 5.9 }
+      ? { x: 0, y: 0.15, z: 7.9 }
       : { x: -0.25, y: 0.28, z: 6.15 };
     const angelRestPos = isMobile
-      ? { x: -1.05, y: -0.68, z: 0.05 }
+      ? { x: -0.84, y: -0.96, z: 0.08 }
       : { x: -1.55, y: -1.25, z: 0.05 };
-    const angelScale = isMobile ? 0.72 : 0.92;
+    const angelScale = isMobile ? 0.56 : 0.92;
 
     if (prefersReducedMotion) {
       camera.position.set(finalCamPos.x, finalCamPos.y, finalCamPos.z);
@@ -345,8 +345,8 @@ const CinematicSceneDirector: React.FC<DirectorProps> = ({
           ease: 'sine.inOut',
           onUpdate: () => {
             const p = orbitStateRef.current.progress;
-            const rx = isMobile ? 1.25 : 1.85;
-            const rz = isMobile ? 1.2 : 1.75;
+            const rx = isMobile ? 0.95 : 1.85;
+            const rz = isMobile ? 0.95 : 1.75;
             const angle = p * Math.PI * 2.15;
 
             const x = jarCenter.x + Math.cos(angle) * rx;
@@ -628,7 +628,7 @@ export const SacredHeroCanvas: React.FC<SacredHeroCanvasProps> = ({
         <Canvas
           frameloop={isPageHidden ? 'never' : 'always'}
           shadows={tier === 'high'}
-          camera={{ position: [0, 0.35, 4.3], fov: isMobile ? 48 : 42 }}
+          camera={{ position: [0, 0.3, isMobile ? 8.4 : 4.3], fov: isMobile ? 52 : 42 }}
           dpr={dprRange}
           gl={{
             antialias: tier !== 'low',

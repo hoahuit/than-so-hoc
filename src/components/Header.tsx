@@ -7,6 +7,7 @@ interface HeaderProps {
   onOpenSaved: () => void;
   onScrollToOmikuji: () => void;
   onOpenTarotDraw: () => void;
+  onOpenFortuneModal: () => void;
   savedCount: number;
   musicOn: boolean;
   onToggleMusic: () => void;
@@ -18,6 +19,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenNumerology,
   onOpenSaved,
   onScrollToOmikuji,
+  onOpenFortuneModal,
   savedCount,
   musicOn,
   onToggleMusic,
@@ -66,8 +68,7 @@ export const Header: React.FC<HeaderProps> = ({
       label: 'Lời xăm',
       action: () => {
         setActiveNav('fortune');
-        const el = document.getElementById('fortune-result-section');
-        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        onOpenFortuneModal();
       },
     },
     {

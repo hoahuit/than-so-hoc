@@ -3,29 +3,41 @@ export type KanjiRank = '大吉' | '上吉' | '中吉' | '小吉' | '吉';
 export type PlanType = 'mini' | 'love' | 'destiny';
 
 export interface FortuneAspects {
-  love: string;    // Tình duyên (1 câu súc tích)
-  career: string;  // Công danh & sự nghiệp (1 câu súc tích)
-  wealth: string;  // Tài lộc & tiền bạc (1 câu súc tích)
-  health: string;  // Sức khỏe & bình an (1 câu súc tích)
+  love: string;
+  career: string;
+  wealth: string;
+  health: string;
+}
+
+export interface FortuneDeepUnlock {
+  rootCause: string;
+  next30Days: string;
+  actionSteps: string[];
 }
 
 export interface OmikujiFortune {
   id: number;
-  stickNumber: number; // Con số quẻ may mắn (1-99)
+  stickNumber: number;
   rank: FortuneRank;
   kanjiRank: KanjiRank;
   title: string;
   theme: string;
-  summary: string;     // Tóm lược 1 câu then chốt
-  poem: string[];      // 4 câu thơ sấm
-  meaning: string;     // Luận giải chi tiết
-  advice: string;      // Lời khuyên hành động
-  aspects: FortuneAspects; // 4 khía cạnh đời sống chia mục rõ ràng
+  summary: string;
+  poem: string[];
+  meaning: string;
+  advice: string;
+  /** Phase 3: 4-layer empathetic structure (safe free depth, leaves desire to unlock/ask deeper) */
+  mirrorMood?: string;
+  careerInsight?: string;
+  loveInsight?: string;
+  closingAdvice?: string;
+  deepUnlock?: FortuneDeepUnlock;
+  aspects: FortuneAspects;
   scores: {
-    love: number;        // Tình duyên %
-    career: number;      // Sự nghiệp %
-    wealth: number;      // Tài lộc %
-    health: number;      // Sức khỏe %
+    love: number;
+    career: number;
+    wealth: number;
+    health: number;
   };
   numerology: {
     luckyNumber: number;
@@ -49,41 +61,41 @@ export const FORTUNE_RANK_INFO: Record<FortuneRank, {
     color: 'text-amber-600',
     bgColor: 'bg-amber-50',
     borderColor: 'border-amber-400',
-    badge: 'ĐẠI CÁT · THẦN LINH PHÙ TRỢ',
+    badge: 'ĐẠI CÁT · KHAI THÔNG CHUYỂN MÌNH',
     kanji: '大吉',
-    vibe: 'Vận khí rực rỡ ngập tràn, vạn sự hanh thông như rồng bay lên mây!',
+    vibe: 'Khoảng lặng đang dần mở lối, bước ngoặt nhỏ sắp đưa bạn ra khỏi nhịp chững lại.',
   },
   'Thượng Cát': {
     color: 'text-temple-700',
     bgColor: 'bg-temple-50',
     borderColor: 'border-temple-600',
-    badge: 'THƯỢNG CÁT · CÁT TƯỜNG NHƯ Ý',
+    badge: 'THƯỢNG CÁT · TÍN HIỆU RÕ DẦN',
     kanji: '上吉',
-    vibe: 'Gió lành thổi đến, hạt mầm thiện lương nay đơm hoa kết trái.',
+    vibe: 'Gió lành bắt đầu thổi qua những điều bạn đã âm thầm gồng gánh suốt thời gian qua.',
   },
   'Trung Cát': {
     color: 'text-temple-800',
     bgColor: 'bg-temple-50/70',
     borderColor: 'border-temple-700',
-    badge: 'TRUNG CÁT · HƯỚNG THIỆN ĐẮC THỜI',
+    badge: 'TRUNG CÁT · GIỮ NHỊP CHỜ THỜI',
     kanji: '中吉',
-    vibe: 'Nước chảy từ từ ắt thành sông, kiên định giữ vững chí hướng.',
+    vibe: 'Chững lại không phải thụt lùi — đây là khoảng dừng cần thiết để tránh bước sai nhịp.',
   },
   'Tiểu Cát': {
     color: 'text-brass-700',
     bgColor: 'bg-brass-50',
     borderColor: 'border-brass-400',
-    badge: 'TIỂU CÁT · KHỞI TÂM AN LẠC',
+    badge: 'TIỂU CÁT · MỞ NÚT THẮT NHẸ',
     kanji: '小吉',
-    vibe: 'Ánh rạng đông dần hé lộ, chớ vội vàng, từng bước an yên.',
+    vibe: 'Sự im lặng kéo dài sắp có hồi đáp nhỏ, nhưng bạn cần chỉnh lại cách giữ sức.',
   },
   'Bình An': {
     color: 'text-ink-muted',
     bgColor: 'bg-washi-100',
     borderColor: 'border-washi-300',
-    badge: 'BÌNH AN · TÂM AN VẠN SỰ AN',
+    badge: 'BÌNH AN · TĨNH TÂM SOI CHIẾU',
     kanji: '吉',
-    vibe: 'Giữ tâm bình thản trước biến động, tích lũy đức độ, phúc lộc tự đến.',
+    vibe: 'Đừng ép câu trả lời ngay hôm nay; khi tâm bớt rối, nút thắt tự khắc lộ hướng gỡ.',
   },
 };
 
@@ -91,185 +103,280 @@ export const OMIKUJI_DATABASE: OmikujiFortune[] = [
   {
     id: 1,
     stickNumber: 28,
-    rank: 'Đại Cát',
-    kanjiRank: '大吉',
-    title: 'Quẻ Số 28: Thần Long Xuất Hải',
-    theme: 'Đại Khai Vận Mệnh',
-    summary: 'Thời vận đang hanh thông, mọi việc tiến triển thuận lợi, công danh rộng mở và nhân duyên hài hòa.',
+    rank: 'Trung Cát',
+    kanjiRank: '中吉',
+    title: 'Khoảng Lặng Trước Khi Chuyển Mình',
+    theme: 'Gồng gánh âm thầm & Chững nhịp',
+    summary: 'Bên ngoài bạn vẫn xoay xở ổn thỏa, nhưng bên trong đã mỏi vì phải tự gồng nhiều thứ một mình giữa giai đoạn chững lại.',
     poem: [
-      'Vạn sự hanh thông, phúc lộc tới,',
-      'Công danh sự nghiệp sớm gặp thời.',
-      'Nhân duyên tốt đẹp, lòng an ổn,',
-      'Gia đạo yên vui, vạn sự như ý.',
+      'Ngoài mặt an nhiên giữ nhịp đời,',
+      'Trong lòng bao nỗi chẳng thành lời.',
+      'Chững lại một nhịp cho bớt mỏi,',
+      'Gió mới đang về cuối chân trời.',
     ],
-    meaning: 'Đây là quẻ Đại Cát, báo hiệu thời vận đang hanh thông, mọi việc tiến triển thuận lợi. Công việc, học hành, làm ăn đều có cơ hội phát triển tốt. Nhân duyên hài hòa, gia đạo êm ấm, tài lộc có dấu hiệu gia tăng.',
-    advice: 'Càng khiêm nhường thì hào quang thần linh ban tặng càng tỏa sáng bền lâu. Hãy giữ tâm sáng và nắm bắt cơ hội tốt.',
+    meaning: 'Dạo gần đây bạn đang ở trong một khoảng chững khá rõ: vẫn làm việc, vẫn gánh trách nhiệm, nhưng cảm giác cạn pin vì mọi thứ cứ lửng lơ chưa bật hẳn lên. Bạn phân vân giữa việc tiếp tục kiên nhẫn hay rẽ sang hướng khác, trong khi tín hiệu bên ngoài vẫn im lặng kéo dài.',
+    advice: 'Khoảng chững lại này không phải để làm bạn nản lòng, mà để bạn dừng việc bước tiếp theo quán tính. Đừng vội quyết định lớn khi tinh thần đang mệt.',
+    mirrorMood:
+      'Có lẽ dạo gần đây bạn đang rơi vào trạng thái quen thuộc: bên ngoài vẫn tỏ ra ổn và tự xoay xở hết mọi việc, nhưng bên trong lại khá mệt vì phải gồng gánh một mình. Bạn muốn có một sự thay đổi rõ ràng hơn, nhưng hiện tại vẫn là cảm giác chững lại, đứng giữa nhiều lựa chọn mà chưa dám chốt hẳn.',
+    careerInsight:
+      'Nhịp công việc chưa hẳn xấu nhưng đang kẹt ở chỗ bạn ôm quá nhiều việc lặp lại hoặc chờ sự phản hồi từ người khác. Đây là lúc nên giữ sức và cân đối lại cách làm; nếu chuẩn bị hợp tác hay ký kết, hãy chú ý các cam kết ngầm thay vì tin lời hứa chung chung.',
+    loveInsight:
+      'Trong chuyện tình cảm hoặc mối quan hệ gần gũi đang có một khoảng im lặng khó gọi tên — không hẳn là hết quan tâm, mà là có điều cả hai đang mập mờ hoặc né tránh nói thẳng vì sợ làm mất hòa khí.',
+    closingAdvice:
+      'Đừng tự ép mình phải giải quyết xong mọi ngã rẽ trong một đêm. Chỉ cần nhận ra bạn đang mệt ở khâu nào và tạm ngưng gồng thay phần người khác, cục diện sẽ bắt đầu nhẹ đi.',
+    deepUnlock: {
+      rootCause:
+        'Nút thắt gốc nằm ở việc bạn đặt tiêu chuẩn tự lực quá cao, ngại nhờ vả và đang dồn năng lượng vào một cam kết/công việc tỷ lệ hoàn vốn cảm xúc thấp.',
+      next30Days:
+        'Từ ngày 12 đến ngày 24 tới sẽ xuất hiện một cuộc trao đổi hoặc tin nhắn làm rõ hướng đi. Nếu bạn giữ được ranh giới rõ ràng ngay từ tuần này, cơ hội dịch chuyển tích cực sẽ rơi vào nửa cuối tháng.',
+      actionSteps: [
+        'Nên làm: Rà soát lại 1 đầu việc hoặc mối quan hệ đang hút sức nhiều nhất và giảm bớt 30% mức đầu tư cảm xúc.',
+        'Nên tránh: Chốt hợp tác mới hoặc đưa ra lời hứa tài chính dài hạn trong 10 ngày tới khi dữ kiện chưa đủ minh bạch.',
+        'Tín hiệu cần để ý: Một lời đề nghị quay lại hoặc gợi ý từ người quen cũ vào cuối tuần.',
+      ],
+    },
     aspects: {
-      career: 'Công danh rộng mở, dễ gặp quý nhân phù trợ. Thời điểm tốt để triển khai kế hoạch, mở rộng công việc hoặc thăng tiến.',
-      wealth: 'Tài lộc có dấu hiệu gia tăng, các khoản đầu tư bắt đầu sinh lời, dòng tiền hanh thông vững chắc.',
-      love: 'Nhân duyên tốt đẹp, lòng an ổn. Người độc thân có duyên kỳ ngộ tao phùng, đôi lứa thấu hiểu sắt son.',
-      health: 'Khí sắc hồng hào, thân tâm an định. Duy trì tập luyện nhẹ nhàng và giữ gìn giấc ngủ ngon.',
+      career: 'Công việc đang kẹt nhịp vì ôm đồm; cần giữ sức và rà kỹ điều khoản trước khi hợp tác hoặc đổi hướng.',
+      wealth: 'Tài chính ở mức cầm chừng, nên giữ tiền mặt an toàn, tránh chi tiêu cảm xúc để giải tỏa stress.',
+      love: 'Có khoảng cách hoặc sự mập mờ chưa nói rõ; một bên đang chờ bên kia lên tiếng trước.',
+      health: 'Cơ thể báo hiệu thiếu ngủ sâu và căng vai gáy do suy nghĩ nhiều vào ban đêm.',
     },
     scores: {
-      love: 96,
-      career: 98,
-      wealth: 95,
-      health: 90,
+      love: 76,
+      career: 81,
+      wealth: 79,
+      health: 74,
     },
     numerology: {
       luckyNumber: 28,
       destinyNumber: 1,
-      color: 'Đỏ Son Chùa Sensoji',
+      color: 'Đỏ Son Ấm Áp',
       direction: 'Chính Đông',
-      amulet: 'Lá Bùa Kim Vận Asakusa',
+      amulet: 'Bùa Tĩnh Tâm Asakusa',
     },
     suitablePlans: ['mini', 'love', 'destiny'],
   },
   {
     id: 2,
     stickNumber: 68,
-    rank: 'Đại Cát',
-    kanjiRank: '大吉',
-    title: 'Quẻ Số 68: Nguyệt Lão Se Duyên',
-    theme: 'Tơ Hồng Viên Mãn',
-    summary: 'Nguyệt Lão điểm trúng mối tơ duyên lành, tình cảm đôi lứa sắt son, tháo gỡ mọi hiểu lầm.',
+    rank: 'Tiểu Cát',
+    kanjiRank: '小吉',
+    title: 'Đứng Giữa Hai Ngã Rẽ Chưa Tên',
+    theme: 'Phân vân lựa chọn & Mập mờ',
+    summary: 'Bạn biết mình không thể đứng mãi ở chỗ cũ, nhưng vẫn thiếu một lý do đủ chắc để bước hẳn sang hướng mới.',
     poem: [
-      'Sợi tơ hồng thắm cột tay duyên,',
-      'Dưới mái chùa xưa cất tiếng nguyền.',
-      'Dẫu cách ngàn trùng qua bão tuyết,',
-      'Bến đỗ bình yên một sớm thuyền.',
+      'Ngã ba sương phủ bóng chiều tà,',
+      'Nửa muốn dừng chân, nửa muốn qua.',
+      'Chớ hỏi gió mây bao giờ dứt,',
+      'Hỏi lòng còn giữ chút thiết tha?',
     ],
-    meaning: 'Thần Nguyệt Lão đã điểm trúng mối tơ duyên của bạn. Người đang đơn thân sẽ gặp được tri kỷ có tần số rung động tương hợp kỳ diệu. Người đang trong mối quan hệ sẽ tháo gỡ hiểu lầm, tiến tới kết tinh tình yêu sắt son.',
-    advice: 'Đừng ngần ngại mở rộng lòng mình và nói ra tiếng nói chân thành của trái tim.',
+    meaning: 'Tâm trạng hiện tại có nhiều giằng co giữa lý trí an toàn và mong muốn thoát khỏi sự tẻ nhạt hiện tại. Sự im lặng từ đối phương hoặc từ công việc khiến bạn hay tự đặt câu hỏi liệu mình có đang đợi nhầm chỗ hay không.',
+    advice: 'Không chọn cũng là một lựa chọn đang âm thầm lấy đi năng lượng mỗi ngày. Hãy thu hẹp câu hỏi lại thay vì cố nhìn hết cả năm.',
+    mirrorMood:
+      'Bạn đang ở đúng cảm giác "tiến chưa nỡ, buông chưa đành". Rất nhiều ngày trôi qua trong trạng thái làm cho tròn vai, còn trong đầu vẫn lấn cấn về một lựa chọn dang dở mà bạn chưa dám nói rõ với ai.',
+    careerInsight:
+      'Điểm nghẽn sự nghiệp nằm ở sự phân tán — bạn thấy nhiều hướng có tiềm năng nhưng chưa dứt khoát đặt cược vào hướng nào. Cơ hội ẩn giấu đang nằm ở một kỹ năng phụ bạn từng bỏ dở; hãy cân đối lại lịch làm việc trước khi nhận thêm trách nhiệm mới.',
+    loveInsight:
+      'Trong mối quan hệ đang có sự mập mờ hoặc lệch nhịp: bạn cho đi sự kiên nhẫn, nhưng lại lờ đi câu hỏi lớn nhất về tương lai chung vì sợ chạm vào khoảng cách thật giữa hai người.',
+    closingAdvice:
+      'Trước khi tìm câu trả lời từ người khác, hãy tự hỏi điều gì đang khiến bạn sợ thay đổi nhất: mất sự quen thuộc hay sợ bắt đầu lại?',
+    deepUnlock: {
+      rootCause:
+        'Sự do dự đến từ việc bạn muốn giữ cả hai phương án cùng lúc để tránh cảm giác hụt hẫng, vô tình khiến cả công việc lẫn tình cảm đều bị treo lưng chừng.',
+      next30Days:
+        'Trong 2 tuần tới có một tình huống nhỏ buộc bạn phải chọn ưu tiên. Khoảnh khắc bạn nói rõ giới hạn của mình cũng là lúc người phù hợp hoặc cơ hội đúng lộ diện.',
+      actionSteps: [
+        'Nên làm: Viết ra 2 lựa chọn hiện tại và cho mỗi lựa chọn một hạn chót cụ thể (ví dụ 21 ngày).',
+        'Nên tránh: Im lặng chịu đựng rồi tự suy diễn ý nghĩ của đối phương hoặc sếp.',
+        'Tín hiệu cần để ý: Cuộc trò chuyện ngắn vào buổi tối giúp lộ rõ thái độ thật của người kia.',
+      ],
+    },
     aspects: {
-      love: 'Duyên trời định đã tới, đôi lứa thấu hiểu sâu sắc, người độc thân sớm tìm thấy tri kỷ.',
-      career: 'Được đồng nghiệp và đối tác tương trợ nhiệt tình, không khí làm việc hài hòa.',
-      wealth: 'Tài chính ổn định, thu chi cân đối, có thêm lộc nhỏ từ bạn bè người thân.',
-      health: 'Tâm trí thảnh thơi, tinh thần sảng khoái, không còn vướng bận âu lo.',
+      love: 'Đang có sự mập mờ hoặc né tránh nói thẳng; giữ im lặng quá lâu chỉ làm khoảng cách xa thêm.',
+      career: 'Có cơ hội chuyển hướng nhưng cần dọn bớt việc phụ mới đủ sức nắm bắt.',
+      wealth: 'Tiền bạc vào ra thất thường nhẹ, tránh đầu tư theo số đông lúc tâm lý chưa vững.',
+      health: 'Dễ mệt mỏi tinh thần vào cuối ngày; nên giảm lướt tin tức tiêu cực trước khi ngủ.',
     },
     scores: {
-      love: 99,
-      career: 88,
-      wealth: 86,
-      health: 92,
+      love: 72,
+      career: 78,
+      wealth: 75,
+      health: 80,
     },
     numerology: {
       luckyNumber: 68,
       destinyNumber: 6,
       color: 'Hồng Đào Sakura',
       direction: 'Đông Nam',
-      amulet: 'Chuông Gió Duyên Lành Musubi',
+      amulet: 'Chuông Gió Khai Tâm',
     },
-    suitablePlans: ['love', 'destiny'],
+    suitablePlans: ['love', 'mini'],
   },
   {
     id: 3,
     stickNumber: 88,
     rank: 'Thượng Cát',
     kanjiRank: '上吉',
-    title: 'Quẻ Số 88: Kim Ngân Mãn Đường',
-    theme: 'Tài Lộc & Công Danh',
-    summary: 'Đỉnh cao tài lộc và hanh thông tiền bạc, những nỗ lực thầm lặng bắt đầu đơm hoa kết trái.',
+    title: 'Giữ Sức Qua Đoạn Khúc Quanh',
+    theme: 'Cơ hội ẩn sau áp lực tài chính & công việc',
+    summary: 'Áp lực vật chất và công việc khiến bạn hơi căng, nhưng bên dưới bề mặt chững lại đang hình thành một lối mở thực tế.',
     poem: [
-      'Đỉnh núi mù sương rạng ánh hồng,',
-      'Thuyền buôn tấp nập vượt trùng sông.',
-      'Vàng mười gom góp về tay chủ,',
-      'Một sớm thênh thang rạng cửa bồng.',
+      'Đá ngầm dưới suối nước còn vương,',
+      'Chớ vội chê dòng chảy chậm đường.',
+      'Giữ vững tay chèo qua đoạn khúc,',
+      'Sớm ngày bến rộng đón vầng dương.',
     ],
-    meaning: 'Tài chính có dấu hiệu khởi sắc vượt bậc, những nỗ lực thầm lặng bấy lâu bắt đầu kết tinh thành dòng tiền và sự công nhận từ cấp trên hoặc đối tác.',
-    advice: 'Nên cẩn trọng trong việc quản lý chi tiêu cá nhân, tái đầu tư vào tri thức và những giá trị lâu dài.',
+    meaning: 'Bạn đã nỗ lực khá bền bỉ nhưng kết quả gần đây chưa tương xứng với công sức bỏ ra. Điều đó dễ khiến bạn nghi ngờ hướng đi của mình, dù thực tế chu kỳ chuyển biến tốt đang bắt đầu tích tụ.',
+    advice: 'Lúc này không cần cố chạy nhanh hơn, mà cần bỏ bớt những đầu việc không sinh giá trị để dồn lực cho điểm chạm đúng.',
+    mirrorMood:
+      'Cảm giác lớn nhất của bạn lúc này là "mình đã cố rất nhiều nhưng sao mọi thứ vẫn chậm hơn kỳ vọng". Nỗi lo cơm áo, KPI hay kế hoạch cá nhân khiến bạn hiếm khi thật sự thả lỏng đầu óc kể cả vào cuối tuần.',
+    careerInsight:
+      'Điểm nghẽn nằm ở cách làm cũ đã hết dư địa tăng trưởng, không phải vì bạn kém năng lực. Cơ hội ẩn giấu sẽ đến qua một lời giới thiệu hoặc một dự án nhỏ tưởng chừng bình thường — hãy cẩn trọng khâu chia quyền lợi khi hợp tác.',
+    loveInsight:
+      'Vì áp lực công việc đè nặng nên bạn vô tình thu mình lại, ít chia sẻ cảm xúc thật với người thân cận. Sự xa cách gần đây phần nhiều đến từ kiệt sức chứ chưa hẳn do hết thương.',
+    closingAdvice:
+      'Tiền bạc và cơ hội cần một tinh thần tỉnh táo mới giữ được. Hãy cho mình một buổi tối thật sự ngắt kết nối công việc để nhìn lại bức tranh lớn.',
+    deepUnlock: {
+      rootCause:
+        'Bạn đang dùng 80% thời gian xử lý việc phát sinh vụn vặt nên không còn dư địa cho việc tạo ra nguồn thu hoặc bước nhảy mới.',
+      next30Days:
+        'Sau mốc 15 ngày tới, dòng tiền hoặc tiến độ công việc bắt đầu nhích lên qua một đầu mối quen biết. Người từng làm việc chung có thể nhắc tên bạn.',
+      actionSteps: [
+        'Nên làm: Chốt lại 1 thế mạnh dễ tạo ra tiền mặt nhanh nhất trong 30 ngày thay vì ôm kế hoạch quá lớn.',
+        'Nên tránh: Cho vay mượn hoặc góp vốn cảm tính khi chưa có văn bản rõ ràng.',
+        'Tín hiệu cần để ý: Một cuộc gọi hoặc tin nhắn hỏi thăm công việc tưởng như xã giao.',
+      ],
+    },
     aspects: {
-      love: 'Tình cảm bình hòa, cả hai cùng chia sẻ tầm nhìn và đồng lòng xây đắp tương lai.',
-      career: 'Năng lực được công nhận rõ rệt, có khả năng nhận thêm trọng trách quan trọng.',
-      wealth: 'Vượng khí tài lộc mạnh mẽ, hợp đồng ký kết suôn sẻ, dòng tiền sinh sôi.',
-      health: 'Cần chú ý nghỉ ngơi điều độ, tránh làm việc quá sức khi vào guồng quay bận rộn.',
+      love: 'Dễ lạnh nhạt do bận rộn và giữ mệt mỏi một mình; một lời hỏi thăm thật lòng sẽ làm dịu lại.',
+      career: 'Cơ hội ẩn trong mạng lưới quen biết; cần rà soát lại cách làm để bớt kiệt sức.',
+      wealth: 'Dòng tiền chậm nhưng chắc; giữ kỷ luật chi tiêu thêm 3 tuần sẽ thấy nhẹ gánh.',
+      health: 'Chú ý dạ dày và nhịp ăn uống thất thường khi chạy tiến độ.',
     },
     scores: {
-      love: 84,
-      career: 94,
-      wealth: 96,
-      health: 88,
+      love: 77,
+      career: 88,
+      wealth: 86,
+      health: 78,
     },
     numerology: {
       luckyNumber: 88,
       destinyNumber: 8,
       color: 'Vàng Đồng Cổ Asakusa',
       direction: 'Tây Bắc',
-      amulet: 'Đồng Xu Cổ Chiêu Tài',
+      amulet: 'Đồng Xu Cổ Tụ Lộc',
     },
     suitablePlans: ['mini', 'destiny'],
   },
   {
     id: 4,
     stickNumber: 18,
-    rank: 'Trung Cát',
-    kanjiRank: '中吉',
-    title: 'Quẻ Số 18: Thanh Thủy Tĩnh Lưu',
-    theme: 'Tâm Hồn An Yên',
-    summary: 'Dòng nước trong êm đềm chảy, giai đoạn tích lũy nội lực và dưỡng tâm lý tưởng.',
+    rank: 'Bình An',
+    kanjiRank: '吉',
+    title: 'Im Lặng Kéo Dài Đợi Câu Trả Lời',
+    theme: 'Khoảng lặng & Chữa lành nội lực',
+    summary: 'Sự im lặng kéo dài khiến bạn bồn chồn, nhưng ép mọi thứ trả lời ngay lúc này lại chỉ làm rối thêm.',
     poem: [
-      'Nước biếc êm đềm chảy góc hiên,',
-      'Trúc đưa kẽ lá rũ ưu phiền.',
-      'Lòng không vướng bận điều hư ảo,',
-      'Trăng sáng đầu non ngự cõi thiền.',
+      'Chuông chùa ngân khẽ giữa chiều sương,',
+      'Đợi một hồi âm suốt dặm trường.',
+      'Tâm tĩnh như hồ không gợn sóng,',
+      'Tự nhiên nhìn rõ lối quay đường.',
     ],
-    meaning: 'Giai đoạn bình ổn để tích lũy nội lực. Dù không có những cú hích thần kỳ đột ngột nhưng đây là khoảng lặng vô giá giúp bạn tái tạo năng lượng thể chất và tinh thần.',
-    advice: 'Dành thời gian chăm sóc sức khỏe, thanh lọc môi trường sống và lắng nghe trực giác mách bảo.',
+    meaning: 'Bạn đang chờ một tín hiệu rõ ràng từ công việc hoặc một người quan trọng, nhưng sự im lặng kéo dài làm lòng bạn bất an. Quẻ này nhắc bạn tạm rút sự chú ý khỏi nơi đang im lặng để quay về củng cố nền tảng của chính mình.',
+    advice: 'Giá trị của bạn không phụ thuộc vào tốc độ hồi đáp của người khác. Khi bạn đứng vững lại, thế chủ động sẽ quay về tay bạn.',
+    mirrorMood:
+      'Điều khiến bạn hao tâm tổn trí nhất dạo này không phải là biến cố lớn, mà là sự im lặng kéo dài — chờ một phản hồi, chờ một thái độ rõ ràng, chờ tình hình khá hơn nhưng ngày nào trôi qua cũng thấy giống nhau.',
+    careerInsight:
+      'Dự án hoặc hồ sơ đang ở trạng thái chờ duyệt/chờ thị trường. Đừng dồn toàn bộ hy vọng vào một cửa duy nhất; hãy âm thầm chuẩn bị phương án dự phòng để không bị động nếu tiến độ kéo dài thêm.',
+    loveInsight:
+      'Khoảng cách trong mối quan hệ đang lớn dần vì cả hai đều sợ mở lời trước sẽ bị hụt hẫng. Điều bạn đang lờ đi là câu hỏi: nếu tình trạng này giữ nguyên thêm 3 tháng nữa, bạn có thật sự ổn không?',
+    closingAdvice:
+      'Ngừng kiểm tra tín hiệu từ bên ngoài trong vài ngày tới. Quay về sắp xếp lại nhịp sống của mình chính là cách đổi vận nhanh nhất lúc này.',
+    deepUnlock: {
+      rootCause:
+        'Bạn đang trao quyền quyết định tâm trạng mỗi ngày của mình cho phản ứng của một người hoặc một kết quả chưa chắc chắn.',
+      next30Days:
+        'Khoảng 10 ngày tới vẫn khá tĩnh, nhưng cuối chu kỳ 30 ngày sẽ có tín hiệu dứt khoát giúp bạn không còn phải đoán già đoán non nữa.',
+      actionSteps: [
+        'Nên làm: Mở thêm 1 phương án dự phòng cho công việc/thu nhập để tâm lý bớt phụ thuộc.',
+        'Nên tránh: Nhắn tin hỏi dồn hoặc đưa ra tối hậu thư trong lúc cảm xúc đang tủi thân.',
+        'Tín hiệu cần để ý: Cảm giác nhẹ nhõm bất ngờ khi bạn quyết định đặt ranh giới cho riêng mình.',
+      ],
+    },
     aspects: {
-      love: 'Mối quan hệ êm đềm, nên chủ động tạo bất ngờ nhỏ để hâm nóng tình cảm.',
-      career: 'Công việc giữ nhịp ổn định, thời điểm vàng để học tập bổ sung kỹ năng mới.',
-      wealth: 'Tài chính an toàn, nên ưu tiên giữ vốn, tránh đầu cơ vào kênh rủi ro cao.',
-      health: 'Thể trạng dẻo dai, tâm hồn thư thái, giấc ngủ sâu và ngon hơn.',
+      love: 'Im lặng kéo dài tạo suy diễn; cần nhìn thẳng xem mình đang đợi vì thương hay vì tiếc.',
+      career: 'Tiến độ chậm khách quan; hợp để nâng cấp kỹ năng và mở thêm phương án phụ.',
+      wealth: 'Giữ nguyên trạng an toàn, không nên mạo hiểm gỡ gạc trong giai đoạn tâm lý sốt ruột.',
+      health: 'Thích hợp đi bộ tối, giảm caffeine và thư giãn hệ thần kinh.',
     },
     scores: {
-      love: 82,
-      career: 80,
-      wealth: 78,
-      health: 96,
+      love: 73,
+      career: 75,
+      wealth: 76,
+      health: 89,
     },
     numerology: {
       luckyNumber: 18,
       destinyNumber: 7,
       color: 'Xanh Trầm Sensoji',
       direction: 'Chính Bắc',
-      amulet: 'Vòng Gỗ Trầm Hương',
+      amulet: 'Bùa Bình An Omamori',
     },
     suitablePlans: ['mini', 'love'],
   },
   {
     id: 5,
-    stickNumber: 9,
+    stickNumber: 77,
     rank: 'Đại Cát',
     kanjiRank: '大吉',
-    title: 'Quẻ Số 09: Cửu Long Quy Nhất',
-    theme: 'Đỉnh Cao Phúc Lạc',
-    summary: 'Quẻ Cực Cát của đền thần! Mọi ý niệm tích cực sẽ nhanh chóng thành hiện thực viên mãn.',
+    title: 'Quý Nhân Mở Nút Thắt Đúng Lúc',
+    theme: 'Tín hiệu sáng sau chuỗi ngày tự xoay',
+    summary: 'Sau quãng thời gian tự xoay xở một mình, sắp có một người hoặc một thông tin đúng lúc giúp bạn gỡ nút thắt.',
     poem: [
-      'Chùa cổ trang nghiêm dưới ráng hồng,',
-      'Thần linh ấn định vận hanh thông.',
-      'Bốn bề phúc lộc quy về một,',
-      'Rạng rỡ danh gia thoả ước mong.',
+      'Đêm dài sương lạnh bước đơn côi,',
+      'Chợt thấy đèn xa rạng cuối đồi.',
+      'Một tiếng đồng lòng qua khúc khó,',
+      'Mây mù tan biến, nắng lên ngôi.',
     ],
-    meaning: 'Quẻ số 09 - Quẻ Cực Cát của đền thần! Bạn đang sở hữu năng lượng bảo bọc từ chư vị thần linh. Mọi ý niệm tích cực bạn phát ra sẽ thành hiện thực trong thời gian ngắn nhất.',
-    advice: 'Hãy làm việc thiện nguyện hoặc giúp đỡ một ai đó xung quanh để kích hoạt dòng năng lượng tích cực lan tỏa vô hạn.',
+    meaning: 'Dù hiện tại bạn vẫn thấy hơi nặng đầu vì nhiều việc chưa xong, năng lượng cô độc sắp kết thúc. Một người có kinh nghiệm hoặc một mối quan hệ thiện lành sẽ mang đến góc nhìn giúp bạn sáng ra.',
+    advice: 'Đừng giữ hết mọi khó khăn trong lòng vì sĩ diện hay sợ làm phiền; mở lời đúng người lúc này sẽ tiết kiệm cho bạn cả tháng tự mò mẫm.',
+    mirrorMood:
+      'Bạn vốn quen tự giải quyết mọi việc từ đầu đến cuối, nên khi gặp chuyện chững lại, phản xạ đầu tiên của bạn là tự gồng và giấu kín. Nhưng sâu bên trong, bạn đang rất mong có ai đó thật sự hiểu và san sẻ cùng mình.',
+    careerInsight:
+      'Cơ hội ẩn giấu nằm ở sự kết nối: một lời khuyên từ tiền bối, đồng nghiệp cũ hoặc khách hàng cũ có thể mở ra hướng giải quyết điểm nghẽn hiện tại. Tuy vậy, vẫn cần phân rõ trách nhiệm trước khi hợp tác chung.',
+    loveInsight:
+      'Có tín hiệu ấm lại từ một cuộc trò chuyện chân thành, hoặc nếu độc thân, bạn dễ gặp người nói chuyện rất hợp tần số trong bối cảnh tự nhiên (công việc, lớp học, bạn bè giới thiệu).',
+    closingAdvice:
+      'Cánh cửa sắp mở nằm ở chữ "kết nối". Hãy trả lời tin nhắn hoặc chủ động kết nối lại với một người bạn từng quý mến.',
+    deepUnlock: {
+      rootCause:
+        'Bạn mất nhiều thời gian không phải vì thiếu năng lực mà vì tự đóng khung mình trong góc nhìn cũ quá lâu.',
+      next30Days:
+        'Trong 14–21 ngày tới, một cuộc gặp hoặc cuộc gọi không hẹn trước sẽ mang đến gợi ý quan trọng cho bước tiếp theo.',
+      actionSteps: [
+        'Nên làm: Chủ động hỏi ý kiến 1 người đi trước đáng tin về vấn đề bạn đang phân vân.',
+        'Nên tránh: Từ chối lời mời gặp gỡ chỉ vì ngại giao tiếp khi đang mệt.',
+        'Tín hiệu cần để ý: Một lời khen hoặc lời gợi ý hợp tác nhẹ từ người ít khi nói nhiều.',
+      ],
+    },
     aspects: {
-      love: 'Hòa khí gia đạo viên mãn, tình duyên đơm hoa, đón nhận nhiều phước lành.',
-      career: 'Thời cơ hiếm có, bước tiến vượt bậc được quý nhân mở đường dẫn lối.',
-      wealth: 'Tụ lộc đại cát, thu nhập gia tăng đáng kể từ nhiều nguồn khác nhau.',
-      health: 'Thân tâm an khang, tràn đầy năng lượng tích cực và nhiệt huyết sống.',
+      love: 'Dễ có sự sẻ chia thật lòng; người độc thân có duyên gặp gỡ qua kết nối quen biết.',
+      career: 'Gỡ được điểm nghẽn nhờ góc nhìn mới; chú ý làm rõ vai trò khi cộng tác.',
+      wealth: 'Tài lộc cải thiện dần nhờ mạng lưới uy tín và khách hàng giới thiệu.',
+      health: 'Tinh thần nhẹ nhõm hơn rõ rệt khi trút được gánh nặng tâm lý.',
     },
     scores: {
-      love: 98,
-      career: 99,
-      wealth: 97,
-      health: 95,
+      love: 91,
+      career: 93,
+      wealth: 89,
+      health: 90,
     },
     numerology: {
-      luckyNumber: 9,
-      destinyNumber: 9,
-      color: 'Đỏ Chu Sa Cổ Tự',
-      direction: 'Tứ Phương Đều Tốt',
-      amulet: 'Gương Bát Quái Cổ Đền Sensoji',
+      luckyNumber: 77,
+      destinyNumber: 11,
+      color: 'Đỏ Rượu Vang',
+      direction: 'Tây Nam',
+      amulet: 'Quạt Giấy Khảm Vàng',
     },
     suitablePlans: ['mini', 'love', 'destiny'],
   },
@@ -278,59 +385,153 @@ export const OMIKUJI_DATABASE: OmikujiFortune[] = [
     stickNumber: 36,
     rank: 'Thượng Cát',
     kanjiRank: '上吉',
-    title: 'Quẻ Số 36: Bách Hoa Tranh Diễm',
-    theme: 'Học Vấn & Thi Cử',
-    summary: 'Trực giác nhạy bén, đầu óc minh mẫn, vạn sự thi cử và bảo vệ kế hoạch thành công mỹ mãn.',
+    title: 'Rà Lại Cách Làm Để Bứt Nhịp',
+    theme: 'Chuyển hướng thông minh & Chắt lọc',
+    summary: 'Bạn không thiếu nỗ lực — bạn chỉ đang dùng sức vào nơi không còn tạo ra đòn bẩy nữa.',
     poem: [
-      'Cánh hạc nghiêng chao đón nắng lành,',
-      'Đèn khuya miệt mài chí thanh danh.',
-      'Bút hoa nở nhụy vờn trang giấy,',
-      'Tên khắc ghi vào bảng rạng danh.',
+      'Cánh hạc dừng chao ngắm hướng mây,',
+      'Đổi chiều theo gió nhẹ đôi tay.',
+      'Chẳng cần gắng sức ngược dòng mãi,',
+      'Thuận thế xoay vần ắt đổi thay.',
     ],
-    meaning: 'Trực giác nhạy bén, đầu óc minh mẫn tột bậc. Rất tốt cho người chuẩn bị thi cử, phỏng vấn, bảo vệ dự án hoặc chuyển đổi ngành nghề mới.',
-    advice: 'Tập trung cao độ, tránh để những thông tin thị phi bên ngoài làm phân tâm dòng chảy suy nghĩ.',
+    meaning: 'Quẻ báo hiệu sự tỉnh táo đang quay lại. Thay vì tiếp tục cố chấp với một kế hoạch đang ì ạch, bạn bắt đầu nhìn thấy đâu là chỗ cần cắt bỏ và đâu là chỗ nên tập trung.',
+    advice: 'Bỏ bớt 2 việc kém hiệu quả quan trọng hơn cố nhồi thêm 1 việc mới vào lịch trình đã quá tải.',
+    mirrorMood:
+      'Có lẽ bạn từng tự hỏi vì sao mình làm việc chăm chỉ không kém ai mà kết quả vẫn cứ lưng chừng. Cảm giác hơi nản và muốn sắp xếp lại toàn bộ cuộc sống đang lớn dần trong bạn vài tuần gần đây.',
+    careerInsight:
+      'Điểm nghẽn là cách phân bổ thời gian và giá trị công sức. Đây là thời điểm tốt để đàm phán lại phạm vi công việc, nâng đơn giá dịch vụ hoặc chuyển trọng tâm sang mảng bạn thật sự giỏi.',
+    loveInsight:
+      'Bạn đang bắt đầu nhìn rõ hơn điều mình cần ở một mối quan hệ, không còn dễ dãi bỏ qua những lần thất vọng nhỏ như trước nữa.',
+    closingAdvice:
+      'Sự rõ ràng với chính mình là khởi đầu của may mắn mới. Đừng tiếc công cũ nếu nó đang giữ chân phiên bản tốt hơn của bạn.',
+    deepUnlock: {
+      rootCause:
+        'Bạn duy trì thói quen "làm cho xong hết" thay vì chọn đúng việc tạo ra giá trị cốt lõi, dẫn đến kiệt lực âm thầm.',
+      next30Days:
+        'Tuần thứ 2–3 sắp tới rất thuận cho việc phỏng vấn, đổi phương án làm việc hoặc ra mắt một thay đổi nhỏ nhưng trúng nhu cầu.',
+      actionSteps: [
+        'Nên làm: Dành 30 phút liệt kê việc nào tạo ra 80% kết quả thực tế và ưu tiên nó vào buổi sáng.',
+        'Nên tránh: So sánh tốc độ của mình với người khác trên mạng xã hội.',
+        'Tín hiệu cần để ý: Một ý tưởng từng bị bạn gạt qua bỗng xuất hiện lại với cơ hội thực tế hơn.',
+      ],
+    },
     aspects: {
-      love: 'Sức hút cá nhân nổi bật nhờ sự thông minh, duyên dáng và tinh tế trong giao tiếp.',
-      career: 'Thi cử đỗ đạt, phỏng vấn suôn sẻ, đề xuất dự án được phê duyệt nhanh chóng.',
-      wealth: 'Thu nhập tăng dần theo uy tín và năng lực chuyên môn của bản thân.',
-      health: 'Cần chú ý thư giãn mắt và giữ ấm cổ họng sau những giờ làm việc căng thẳng.',
+      love: 'Thẳng thắn với nhu cầu của bản thân giúp mối quan hệ lành mạnh hoặc sàng lọc đúng người.',
+      career: 'Rất tốt để chỉnh chiến lược, thi cử, phỏng vấn hoặc tái cơ cấu công việc.',
+      wealth: 'Thu nhập cải thiện khi bạn cắt giảm khoản rò rỉ và định giá đúng năng lực.',
+      health: 'Thư giãn mắt và vai cổ, tránh làm việc khuya liên tục nhiều ngày.',
     },
     scores: {
       love: 80,
-      career: 95,
-      wealth: 86,
-      health: 88,
+      career: 92,
+      wealth: 87,
+      health: 84,
     },
     numerology: {
       luckyNumber: 36,
       destinyNumber: 3,
       color: 'Vàng Kim Hoàng Gia',
       direction: 'Đông Bắc',
-      amulet: 'Bút Trâm Văn Xương',
+      amulet: 'Bút Trâm Khai Trí',
     },
     suitablePlans: ['mini', 'destiny'],
   },
   {
     id: 7,
-    stickNumber: 77,
+    stickNumber: 52,
+    rank: 'Tiểu Cát',
+    kanjiRank: '小吉',
+    title: 'Mầm Xanh Hé Lộ Giữa Mùa Lạnh',
+    theme: 'Khởi động lại từ bước nhỏ',
+    summary: 'Chưa có cú nhảy vọt ngay, nhưng những dấu hiệu hồi phục đầu tiên đã bắt đầu nhú lên lặng lẽ.',
+    poem: [
+      'Tuyết mỏng vương trên nụ sớm mai,',
+      'Âm thầm gom nhựa chẳng phô phai.',
+      'Chớ chê bước nhỏ chưa thành lớn,',
+      'Nắng ấm qua rồi nở đóa mai.',
+    ],
+    meaning: 'Sau giai đoạn mệt mỏi kéo dài, bạn không nên ép mình bật dậy mạnh mẽ ngay lập tức. Hãy coi đây là giai đoạn khởi động lại nhẹ nhàng: từng việc nhỏ trôi chảy sẽ kéo sự tự tin quay trở lại.',
+    advice: 'Kiên nhẫn giữ nhịp đều trong 2 tuần tới, tránh đốt cháy giai đoạn hay kỳ vọng kết quả tức thì.',
+    mirrorMood:
+      'Bạn không hẳn là tuyệt vọng, chỉ là hơi chênh vênh vì chưa thấy tín hiệu bứt phá rõ rệt. Cảm giác sống chậm lại một chút vừa làm bạn nhẹ lòng, vừa khiến bạn hơi lo mình bị tụt lại phía sau.',
+    careerInsight:
+      'Công việc mới hoặc hướng đi mới đang ở giai đoạn gieo mầm, cần làm chắc từng khâu nhỏ. Nếu hợp tác mới, hãy thử nghiệm quy mô nhỏ trước khi dốc toàn bộ vốn hoặc thời gian.',
+    loveInsight:
+      'Tình cảm có dấu hiệu nhẹ nhàng hơn nếu cả hai bớt đòi hỏi hoàn hảo. Với người độc thân, sự cởi mở từ tốn sẽ an toàn và bền hơn những rung động vội vàng.',
+    closingAdvice:
+      'Đừng coi thường những ngày bình thường không biến cố — đó chính là nền đất để cây mới bén rễ.',
+    deepUnlock: {
+      rootCause:
+        'Bạn dễ nản ở tuần thứ hai vì đặt mục tiêu quá lớn trong khi năng lượng hồi phục vẫn đang ở giai đoạn đầu.',
+      next30Days:
+        'Tín hiệu tích cực rõ nhất sẽ đến vào khoảng tuần thứ 3–4 thông qua một kết quả nhỏ nhưng chứng minh bạn đang đi đúng hướng.',
+      actionSteps: [
+        'Nên làm: Chia mục tiêu hiện tại thành các mốc 7 ngày thật gọn để dễ hoàn thành.',
+        'Nên tránh: Nghe quá nhiều lời khuyên trái chiều khiến bạn thay đổi kế hoạch liên tục.',
+        'Tín hiệu cần để ý: Cảm giác hứng thú quay lại với một việc bạn từng thích làm.',
+      ],
+    },
+    aspects: {
+      love: 'Tình cảm nhen nhóm nhẹ nhàng; cần sự kiên nhẫn thay vì thúc ép câu trả lời.',
+      career: 'Phù hợp khởi động dự án nhỏ, học thêm kỹ năng nền tảng.',
+      wealth: 'Tài chính vừa đủ, ưu tiên tích lũy từng khoản nhỏ và kiểm soát chi tiêu cố định.',
+      health: 'Giữ ấm cơ thể, ngủ đủ giấc để phục hồi sinh lực tự nhiên.',
+    },
+    scores: {
+      love: 79,
+      career: 82,
+      wealth: 77,
+      health: 86,
+    },
+    numerology: {
+      luckyNumber: 52,
+      destinyNumber: 4,
+      color: 'Trắng Ngà Washi',
+      direction: 'Chính Tây',
+      amulet: 'Bùa Hộ Mệnh Sakura',
+    },
+    suitablePlans: ['mini', 'love'],
+  },
+  {
+    id: 8,
+    stickNumber: 9,
     rank: 'Đại Cát',
     kanjiRank: '大吉',
-    title: 'Quẻ Số 77: Thất Tinh Tụ Hội',
-    theme: 'Quý Nhân Phù Trợ',
-    summary: 'Quý nhân xuất hiện tương trợ đúng thời khắc then chốt, tháo gỡ mọi nút thắt bế tắc.',
+    title: 'Cởi Bỏ Gánh Nặng, Đón Luồng Khí Mới',
+    theme: 'Giải tỏa nút thắt & Hanh thông',
+    summary: 'Khoảng tối đang khép lại — điều bạn trăn trở suốt thời gian qua sắp có hướng giải tỏa nhẹ nhàng hơn bạn nghĩ.',
     poem: [
-      'Đèn lồng soi sáng lối hoa tiêu,',
-      'Bằng hữu chung lòng đón gió xiêu.',
-      'Tay nắm chặt tay qua ải hiểm,',
-      'Vang lừng tiếng nhạc giữa hoàng triều.',
+      'Mây xám tan dần lộ nắng mai,',
+      'Gánh sầu đặt xuống nhẹ đôi vai.',
+      'Tâm sáng hướng về điều tử tế,',
+      'Phúc lành tự khắc đến bên tai.',
     ],
-    meaning: 'Quý nhân tương trợ xuất hiện đúng thời điểm then chốt nhất. Mọi khó khăn tưởng chừng bế tắc sẽ được một người bạn hoặc tiền bối tháo gỡ dễ dàng.',
-    advice: 'Chủ động kết nối và mở lòng biết ơn. Mối quan hệ này có thể định hình vận mệnh sắp tới của bạn.',
+    meaning: 'Quẻ Đại Cát nhưng không mang màu sắc hào nhoáng xa vời, mà là sự nhẹ nhõm thật sự: những hiểu lầm dần tan, công việc bớt tắc và bạn lấy lại được niềm tin vào lựa chọn của mình.',
+    advice: 'Khi cơ hội mở ra, hãy đón nhận với tâm thế điềm tĩnh và giữ lại một khoảng thở cho bản thân.',
+    mirrorMood:
+      'Bạn đã đi qua một đoạn khá nhiều áp lực và suy tư thầm lặng. Dù đôi lúc vẫn còn chút dè chừng vì sợ mừng hụt, linh cảm bên trong bạn đang mách rằng mọi chuyện sắp dễ thở hơn rồi.',
+    careerInsight:
+      'Nút thắt công việc sắp được tháo gỡ nhờ sự thay đổi tích cực từ phía đối tác hoặc quyết định dứt khoát của chính bạn. Thuận lợi để chốt kế hoạch đã ấp ủ kỹ.',
+    loveInsight:
+      'Những gợn lấn cấn được hóa giải nếu bạn mở lòng nói nhẹ nhàng điều mình mong muốn. Gia đạo và các mối quan hệ thân thiết mang lại cảm giác được nâng đỡ.',
+    closingAdvice:
+      'Hãy trân trọng cảm giác bình yên đang quay lại và đừng quên chia sẻ một chút năng lượng tích cực cho người bên cạnh.',
+    deepUnlock: {
+      rootCause:
+        'Bạn đã đi hết phần khó nhất của chu kỳ cũ; thứ duy nhất còn giữ lại chút nặng nề là thói quen cảnh giác quá mức.',
+      next30Days:
+        '30 ngày tới mang sắc thái khai thông rõ rệt: tin vui về công việc hoặc tài chính nhỏ xuất hiện trong nửa đầu tháng, kéo theo tinh thần phấn chấn.',
+      actionSteps: [
+        'Nên làm: Tự tin triển khai việc bạn đã chuẩn bị kỹ thay vì trì hoãn thêm.',
+        'Nên tránh: Mang tâm lý phòng thủ cũ áp vào những người thật lòng hỗ trợ bạn.',
+        'Tín hiệu cần để ý: Một sự trùng hợp đẹp giúp hai việc tưởng rời rạc bỗng khớp vào nhau.',
+      ],
+    },
     aspects: {
-      love: 'Được đối phương che chở, tình cảm vững vàng vượt qua mọi sóng gió thử thách.',
-      career: 'Có bậc tiền bối dìu dắt, việc khó hóa dễ, gặt hái sự tin tưởng của tập thể.',
-      wealth: 'Hợp tác đem lại nguồn lợi lớn, tài lộc hanh thông nhờ mạng lưới bạn bè.',
-      health: 'Sức sống dồi dào, thể lực tốt, tinh thần vui tươi phấn khởi mỗi ngày.',
+      love: 'Hòa khí ấm áp, dễ hóa giải hiểu lầm và tìm thấy sự đồng cảm sâu sắc.',
+      career: 'Khai thông bế tắc, cơ hội tốt đến đúng lúc bạn sẵn sàng.',
+      wealth: 'Dòng tiền khởi sắc, có thêm lộc từ công việc phụ hoặc hợp tác uy tín.',
+      health: 'Thần sắc sáng hơn, giấc ngủ sâu và tinh thần nhẹ nhõm.',
     },
     scores: {
       love: 94,
@@ -339,92 +540,18 @@ export const OMIKUJI_DATABASE: OmikujiFortune[] = [
       health: 93,
     },
     numerology: {
-      luckyNumber: 77,
-      destinyNumber: 11,
-      color: 'Đỏ Rượu Vang',
-      direction: 'Tây Nam',
-      amulet: 'Quạt Giấy Khảm Vàng Asakusa',
-    },
-    suitablePlans: ['love', 'destiny'],
-  },
-  {
-    id: 8,
-    stickNumber: 52,
-    rank: 'Tiểu Cát',
-    kanjiRank: '小吉',
-    title: 'Quẻ Số 52: Sơ Tuyết Nghênh Mai',
-    theme: 'Khởi Đầu Mới',
-    summary: 'Mầm cây bắt đầu nhú chồi qua mùa đông lạnh, kiên nhẫn từng bước ắt gặt quả ngọt.',
-    poem: [
-      'Tuyết mỏng vương trên cánh đóa mai,',
-      'Gian truân tôi luyện bậc anh tài.',
-      'Chân trời hé lộ tia mai ấm,',
-      'Hạnh phúc tròn đầy đợi sớm mai.',
-    ],
-    meaning: 'Những dấu hiệu tích cực ban đầu đã xuất hiện. Công việc và dự án có tiến triển nhưng cần thêm thời gian để trưởng thành và gặt hái.',
-    advice: 'Kiên nhẫn là chìa khóa vàng lúc này. Chớ đốt cháy giai đoạn để tránh những sơ sót không đáng có.',
-    aspects: {
-      love: 'Tình cảm chớm nở nhẹ nhàng, hãy để mọi việc diễn tiến tự nhiên, chớ vội vàng.',
-      career: 'Dự án mới bắt đầu khởi động, chú trọng tích lũy và làm chắc từng khâu nhỏ.',
-      wealth: 'Tài chính ở mức vừa đủ, nên có kế hoạch chi tiêu hợp lý và tiết kiệm.',
-      health: 'Giữ ấm cơ thể khi thời tiết thay đổi, chú ý dinh dưỡng và ngủ đủ giấc.',
-    },
-    scores: {
-      love: 79,
-      career: 80,
-      wealth: 75,
-      health: 85,
-    },
-    numerology: {
-      luckyNumber: 52,
-      destinyNumber: 4,
-      color: 'Trắng Ngà Washi',
-      direction: 'Chính Tây',
-      amulet: 'Bùa Bình An Omamori',
-    },
-    suitablePlans: ['mini', 'love'],
-  },
-  {
-    id: 9,
-    stickNumber: 61,
-    rank: 'Bình An',
-    kanjiRank: '吉',
-    title: 'Quẻ Số 61: Tĩnh Tâm Tu Dưỡng',
-    theme: 'An Định Nội Lực',
-    summary: 'Giữ tâm bình lặng trước biến động, củng cố nền tảng nội tại, phúc lộc tự khắc tụ hội.',
-    poem: [
-      'Chùa xưa chuông điểm bóng tà dương,',
-      'Gác lại âu lo giữa dặm trường.',
-      'Tâm phẳng như gương đời bớt sóng,',
-      'Mai về rạng rỡ ngát thơm hương.',
-    ],
-    meaning: 'Hiện tại thích hợp để nghỉ ngơi, nhìn nhận lại bản thân và củng cố nền tảng. Chớ vội vàng mưu cầu đại sự, hãy chú trọng gìn giữ hòa khí và gia đạo êm ấm.',
-    advice: 'Nên dành thời gian thiền tịnh, dọn dẹp không gian sống và duy trì thói quen ngủ nghỉ điều độ.',
-    aspects: {
-      love: 'Lắng nghe và thấu hiểu nhiều hơn, dĩ hòa vi quý để giữ trọn vẹn sự êm ấm.',
-      career: 'Giai đoạn củng cố vị trí, tránh mạo hiểm nhảy việc hay đưa ra quyết định hấp tấp.',
-      wealth: 'Thu chi ổn định, kiểm soát ngân sách an toàn, tránh cho vay mượn rủi ro.',
-      health: 'Thích hợp thanh lọc tâm trí, đi dạo hòa mình vào thiên nhiên để hồi phục sinh lực.',
-    },
-    scores: {
-      love: 78,
-      career: 76,
-      wealth: 74,
-      health: 92,
-    },
-    numerology: {
-      luckyNumber: 61,
-      destinyNumber: 2,
-      color: 'Xanh Rêu Cổ Tự',
+      luckyNumber: 9,
+      destinyNumber: 9,
+      color: 'Đỏ Chu Sa Cổ Tự',
       direction: 'Chính Nam',
-      amulet: 'Lá Bùa Trừ Tà Yakuyoke',
+      amulet: 'Lá Bùa Kim Vận Asakusa',
     },
-    suitablePlans: ['mini', 'destiny'],
-  }
+    suitablePlans: ['mini', 'love', 'destiny'],
+  },
 ];
 
 export function getRandomFortune(plan: PlanType = 'mini'): OmikujiFortune {
-  const filtered = OMIKUJI_DATABASE.filter(f => f.suitablePlans.includes(plan));
+  const filtered = OMIKUJI_DATABASE.filter((f) => f.suitablePlans.includes(plan));
   const pool = filtered.length > 0 ? filtered : OMIKUJI_DATABASE;
   const randomIndex = Math.floor(Math.random() * pool.length);
   return pool[randomIndex];

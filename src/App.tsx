@@ -5,12 +5,13 @@ import { Header } from './components/Header';
 import { MarqueeBanner } from './components/MarqueeBanner';
 import { HeroOmikujiSection } from './components/HeroOmikujiSection';
 import { PlansCarousel } from './components/PlansCarousel';
-import { FortuneCardDisplay } from './components/FortuneCardDisplay';
 import { DailyFortune } from './components/DailyFortune';
+import { JapaneseBackdropDecor } from './components/JapaneseBackdropDecor';
 import { type SavedFortuneEntry } from './components/SavedFortunesDrawer';
 import { FloatingBottomNav } from './components/FloatingBottomNav';
 import { SealedFortuneIntro } from './components/SealedFortuneIntro';
 import { OMIKUJI_DATABASE, getRandomFortune, type OmikujiFortune, type PlanType } from './data/omikujiData';
+import type { DrawnTarotCard } from './data/tarotData';
 import { shrineAudio } from './utils/sound';
 
 const OmikujiShakeModal = lazy(() =>
@@ -25,18 +26,53 @@ const NumerologyCalculatorModal = lazy(() =>
 const SavedFortunesDrawer = lazy(() =>
   import('./components/SavedFortunesDrawer').then((m) => ({ default: m.SavedFortunesDrawer }))
 );
+const OmamoriGiftModal = lazy(() =>
+  import('./components/OmamoriGiftModal').then((m) => ({ default: m.OmamoriGiftModal }))
+);
+const UnlockDonateModal = lazy(() =>
+  import('./components/UnlockDonateModal').then((m) => ({ default: m.UnlockDonateModal }))
+);
+const TarotConciergeModal = lazy(() =>
+  import('./components/TarotConciergeModal').then((m) => ({ default: m.TarotConciergeModal }))
+);
+const FortuneResultModal = lazy(() =>
+  import('./components/FortuneResultModal').then((m) => ({ default: m.FortuneResultModal }))
+);
 
 const STORAGE_KEY = 'kami_no_su_saved_fortunes_v1';
+const UNLOCK_STORAGE_KEY = 'kami_no_su_unlocked_v1';
+const INTRO_SESSION_KEY = 'kami_no_su_intro_seen_v1';
 
 export function App() {
   const [selectedPlan, setSelectedPlan] = useState<PlanType>('love');
   const [currentFortune, setCurrentFortune] = useState<OmikujiFortune>(OMIKUJI_DATABASE[0]);
+  const [drawnTarotCards, setDrawnTarotCards] = useState<DrawnTarotCard[]>([]);
   const [flipVersion, setFlipVersion] = useState<number>(0);
 
   const [isShakeModalOpen, setIsShakeModalOpen] = useState<boolean>(false);
+  const [isFortuneModalOpen, setIsFortuneModalOpen] = useState<boolean>(false);
   const [isNumerologyOpen, setIsNumerologyOpen] = useState<boolean>(false);
   const [isSavedOpen, setIsSavedOpen] = useState<boolean>(false);
-  const [showSealedIntro, setShowSealedIntro] = useState<boolean>(false);
+  const [isGiftModalOpen, setIsGiftModalOpen] = useState<boolean>(false);
+  const [isUnlockModalOpen, setIsUnlockModalOpen] = useState<boolean>(false);
+  const [isConciergeOpen, setIsConciergeOpen] = useState<boolean>(false);
+
+  const [showSealedIntro, setShowSealedIntro] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem(INTRO_SESSION_KEY) !== '1';
+    } catch {
+      return true;
+    }
+  });
+
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(UNLOCK_STORAGE_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
+
   const [activeMobileTab, setActiveMobileTab] = useState<'home' | 'plans' | 'numerology' | 'saved'>('home');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -63,7 +99,6 @@ export function App() {
     }
   }, [musicOn]);
 
-  // Auto-start music on first genuine user interaction (pointerdown / touchend / click)
   useEffect(() => {
     const startOnInteraction = async () => {
       if (autoStartedRef.current) return;
@@ -115,21 +150,54 @@ export function App() {
   const handleFortuneDrawn = useCallback((fortune: OmikujiFortune) => {
     setCurrentFortune(fortune);
     setFlipVersion((prev) => prev + 1);
+    setIsShakeModalOpen(false);
+    setIsFortuneModalOpen(true);
   }, []);
+
+  const markIntroSeen = () => {
+    try {
+      sessionStorage.setItem(INTRO_SESSION_KEY, '1');
+    } catch {
+      // Ignore storage errors
+    }
+  };
 
   const handleUnsealIntro = useCallback(() => {
     const todayFortune = getRandomFortune(selectedPlan);
     setCurrentFortune(todayFortune);
     setFlipVersion((prev) => prev + 1);
     setShowSealedIntro(false);
+    markIntroSeen();
     if (shrineAudio.bgMusicPlaying) {
       setMusicOn(true);
     }
+    // Lead smoothly into Stage 2 shake ritual
+    setIsShakeModalOpen(true);
   }, [selectedPlan]);
+
+  const handleSkipIntro = useCallback(() => {
+    setShowSealedIntro(false);
+    markIntroSeen();
+  }, []);
 
   const handleOpenShakeModal = useCallback(() => {
     setIsShakeModalOpen(true);
   }, []);
+
+  const handleConfirmUnlock = useCallback(
+    (amount: number) => {
+      setIsUnlocked(true);
+      try {
+        localStorage.setItem(UNLOCK_STORAGE_KEY, '1');
+      } catch {
+        // Ignore storage errors
+      }
+      showToast(
+        `Cảm ơn bạn đã gieo duyên ${amount.toLocaleString('vi-VN')}đ! Đã mở khóa lời giải sâu & trải bài Tarot 3 lá.`
+      );
+    },
+    [showToast]
+  );
 
   const isFortuneSaved = useCallback(
     (fortune: OmikujiFortune) => savedFortunes.some((entry) => entry.fortune.id === fortune.id),
@@ -165,7 +233,7 @@ export function App() {
   };
 
   const handleShareFortune = async (fortune: OmikujiFortune) => {
-    const shareText = `⛩️ XĂM MAY MẮN - Đền Thần Asakusa Nhật Bản:\n✦ Quẻ Số ${fortune.stickNumber} (${fortune.kanjiRank} · ${fortune.rank})\n✦ "${fortune.title}"\n📜 ${fortune.poem.join(' / ')}\n❤️ Tình duyên: ${fortune.scores.love}% | 💰 Tài lộc: ${fortune.scores.wealth}% | 💼 Sự nghiệp: ${fortune.scores.career}%\nXin xăm may mắn ngay hôm nay!`;
+    const shareText = `⛩️ XĂM MAY MẮN - Kami no Sū:\n✦ Quẻ Số ${fortune.stickNumber}: "${fortune.title}" (${fortune.rank})\n📜 ${fortune.poem.join(' / ')}\n✨ ${fortune.summary}`;
 
     if (navigator.share) {
       try {
@@ -191,18 +259,23 @@ export function App() {
 
   return (
     <div className="relative min-h-screen temple-bg text-ink selection:bg-temple-800 selection:text-white">
-      {/* First-3-Seconds Hook: Sealed Fortune Intro */}
-      <SealedFortuneIntro isVisible={showSealedIntro} onUnseal={handleUnsealIntro} />
+      {/* Stage 1: Curiosity Hook Intro */}
+      <SealedFortuneIntro
+        isVisible={showSealedIntro}
+        onUnseal={handleUnsealIntro}
+        onSkip={handleSkipIntro}
+      />
 
       {/* Subtle Floating Petals Canvas */}
       <PetalsCanvas />
 
-      {/* Transparent-to-Solid Header (Stage A Instant Shell) */}
+      {/* Header */}
       <Header
         onOpenNumerology={() => setIsNumerologyOpen(true)}
         onOpenSaved={() => setIsSavedOpen(true)}
         onScrollToOmikuji={() => scrollToElement('hero-omikuji-section')}
         onOpenTarotDraw={() => scrollToElement('tarot-section')}
+        onOpenFortuneModal={() => setIsFortuneModalOpen(true)}
         savedCount={savedFortunes.length}
         musicOn={musicOn}
         onToggleMusic={handleToggleMusic}
@@ -214,34 +287,26 @@ export function App() {
           selectedPlan={selectedPlan}
           onSelectPlan={setSelectedPlan}
           onFortuneDrawn={handleFortuneDrawn}
+          onOpenFortuneModal={() => setIsFortuneModalOpen(true)}
         />
       </div>
 
       {/* Traditional Temple Marquee Banner */}
       <MarqueeBanner />
 
-      {/* ================= 2. MAIN CONTENT: FOCUS ON LỜI XĂM & SỐ MAY MẮN ================= */}
-      <main className="relative z-20 w-full space-y-8 px-4 py-8 pb-28 sm:space-y-10 sm:px-6 sm:py-10 lg:px-10 xl:px-16 md:pb-16">
-        {/* LỜI QUẺ XĂM CHI TIẾT (Trọng tâm trải nghiệm) */}
-        <div id="fortune-result-section">
-          <FortuneCardDisplay
-            fortune={currentFortune}
-            plan={selectedPlan}
-            isSaved={isCurrentSaved}
-            onSave={handleSaveFortune}
-            onShare={handleShareFortune}
-            onRedraw={() => scrollToElement('hero-omikuji-section')}
-            flipVersion={flipVersion}
-          />
-        </div>
+      {/* ================= 2. MAIN CONTENT: LUXURY JAPANESE PACKAGES & DAILY LUCK ================= */}
+      <main className="relative z-20 w-full overflow-hidden bg-gradient-to-b from-[#fdf9f2] via-[#fbf4e7] to-[#fbf4e7] space-y-8 px-4 py-10 sm:space-y-10 sm:px-6 sm:py-12 lg:px-10 xl:px-16">
+        <JapaneseBackdropDecor />
 
-        {/* 2 Cột Cân Đối: Chọn Ý Nguyện (Trái) + Con Số May Mắn Hôm Nay (Phải) */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-stretch">
+        {/* 2 Cột Cân Đối: Gói Gieo Duyên (Trái) + Con Số May Mắn Hôm Nay (Phải) */}
+        <div className="relative z-10 grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-stretch">
           <div className="lg:col-span-6 flex flex-col justify-center">
             <PlansCarousel
               selectedPlan={selectedPlan}
+              isUnlocked={isUnlocked}
               onSelectPlan={setSelectedPlan}
               onScrollToDraw={() => scrollToElement('hero-omikuji-section')}
+              onOpenUnlock={() => setIsUnlockModalOpen(true)}
             />
           </div>
 
@@ -251,35 +316,37 @@ export function App() {
             </div>
           </div>
         </div>
-
-        {/* Trải Bài Tarot Omikuji (Lazy-loaded) */}
-        <div id="tarot-section">
-          <Suspense fallback={null}>
-            <TarotOmikujiDeck
-              selectedPlan={selectedPlan}
-              onCardPicked={(fortune) => {
-                handleFortuneDrawn(fortune);
-                scrollToElement('fortune-result-section');
-              }}
-            />
-          </Suspense>
-        </div>
       </main>
+
+      {/* ================= 3. FULL-SCREEN TAROT SECTION ================= */}
+      <div id="tarot-section" className="relative z-20 w-full pb-24 md:pb-0">
+        <Suspense fallback={null}>
+          <TarotOmikujiDeck
+            isUnlocked={isUnlocked}
+            onUnlockClick={() => setIsUnlockModalOpen(true)}
+            onCardsDrawn={(cards) => setDrawnTarotCards(cards)}
+            onConsult1on1={(cards) => {
+              setDrawnTarotCards(cards);
+              setIsConciergeOpen(true);
+            }}
+          />
+        </Suspense>
+      </div>
 
       {/* Footer */}
       <footer className="relative z-20 hidden border-t border-temple-200 bg-[#f8f2e9] py-8 text-center text-xs text-ink-muted md:block">
         <div className="flex w-full flex-col items-center justify-between gap-3 px-6 lg:px-12 xl:px-16 sm:flex-row">
           <div className="flex items-center gap-2">
             <span className="font-jp text-base font-bold text-temple-800">神の数</span>
-            <span className="font-semibold text-temple-900">· Xăm May Mắn Asakusa © 2026</span>
+            <span className="font-semibold text-temple-900">· Xăm &amp; Tarot Kami no Sū © 2026</span>
           </div>
           <p className="text-ink-muted">
-            Lắc xăm mang lại điềm lành, năng lượng tích cực &amp; sự bình an trong tâm hồn 🌸
+            Lắc xăm &amp; soi chiếu Tarot để tìm lại nhịp bình an và câu trả lời cho riêng mình 🌸
           </p>
         </div>
       </footer>
 
-      {/* Mobile Floating Bottom Bar (Stage A Instant Shell) */}
+      {/* Mobile Floating Bottom Bar */}
       <FloatingBottomNav
         activeTab={activeMobileTab}
         onHome={() => {
@@ -329,8 +396,44 @@ export function App() {
           onSelectFortune={(fortune) => {
             setCurrentFortune(fortune);
             setFlipVersion((prev) => prev + 1);
-            scrollToElement('fortune-result-section');
+            setIsFortuneModalOpen(true);
           }}
+        />
+
+        <FortuneResultModal
+          isOpen={isFortuneModalOpen}
+          fortune={currentFortune}
+          plan={selectedPlan}
+          isSaved={isCurrentSaved}
+          isUnlocked={isUnlocked}
+          flipVersion={flipVersion}
+          onClose={() => setIsFortuneModalOpen(false)}
+          onSave={handleSaveFortune}
+          onShare={handleShareFortune}
+          onRedraw={() => handleOpenShakeModal()}
+          onOpenGift={() => setIsGiftModalOpen(true)}
+          onOpenUnlock={() => setIsUnlockModalOpen(true)}
+          onConsult1on1={() => setIsConciergeOpen(true)}
+        />
+
+        <OmamoriGiftModal
+          isOpen={isGiftModalOpen}
+          fortune={currentFortune}
+          onClose={() => setIsGiftModalOpen(false)}
+        />
+
+        <UnlockDonateModal
+          isOpen={isUnlockModalOpen}
+          selectedPlan={selectedPlan}
+          onClose={() => setIsUnlockModalOpen(false)}
+          onConfirmUnlock={handleConfirmUnlock}
+        />
+
+        <TarotConciergeModal
+          isOpen={isConciergeOpen}
+          fortune={currentFortune}
+          drawnTarotCards={drawnTarotCards}
+          onClose={() => setIsConciergeOpen(false)}
         />
       </Suspense>
 

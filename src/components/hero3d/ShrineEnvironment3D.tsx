@@ -92,9 +92,9 @@ export const ShrineEnvironment3D: React.FC<ShrineEnvironment3DProps> = ({
         <planeGeometry args={[28, 18]} />
         {!highQuality ? (
           <meshStandardMaterial
-            color="#0f050a"
-            roughness={0.14}
-            metalness={0.86}
+            color="#0d0307"
+            roughness={0.48}
+            metalness={0.32}
           />
         ) : (
           <MeshReflectorMaterial

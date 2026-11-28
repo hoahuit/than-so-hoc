@@ -247,3 +247,97 @@
 .animate-cta-shimmer {
   animation: ctaShimmerSweep 3.4s ease-in-out infinite;
 }
+
+/* ===================== LUXURY JAPANESE FORTUNE MOTION ===================== */
+@keyframes luckyHaloPulse {
+  0%, 100% {
+    opacity: 0.45;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes gentlePetalDrift {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.7;
+  }
+  80% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate3d(26px, 75px, 0) rotate(140deg);
+    opacity: 0;
+  }
+}
+
+.animate-halo-pulse {
+  animation: luckyHaloPulse 3.6s ease-in-out infinite;
+}
+
+.animate-petal-drift {
+  animation: gentlePetalDrift 10s ease-in-out infinite;
+}
+
+@keyframes oracleLevitate {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes cardFloatBob {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes summonEnergyPulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.08);
+  }
+}
+
+.animate-oracle-levitate {
+  animation: oracleLevitate 5.2s ease-in-out infinite;
+}
+
+.animate-card-bob {
+  animation: cardFloatBob 3.8s ease-in-out infinite;
+}
+
+.animate-summon-pulse {
+  animation: summonEnergyPulse 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-halo-pulse,
+  .animate-petal-drift,
+  .animate-oracle-levitate,
+  .animate-card-bob,
+  .animate-summon-pulse,
+  .animate-seal-leak,
+  .animate-seal-rays,
+  .animate-ember-drift,
+  .animate-cta-shimmer,
+  .animate-twinkle,
+  .animate-twinkle-slow {
+    animation: none !important;
+  }
+}
